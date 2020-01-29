@@ -10,21 +10,11 @@ namespace AzureDevopsPlugin
     [System.ComponentModel.ToolboxItemAttribute(false)]
     partial class WorkItemRegion : Microsoft.Office.Tools.Outlook.FormRegionBase
     {
-        private Uri uri { get; }
-        private string personalAccessToken { get; }
 
         public WorkItemRegion(Microsoft.Office.Interop.Outlook.FormRegion formRegion)
             : base(Globals.Factory, formRegion)
         {
             this.InitializeComponent();
-            //if (Settings.settings.Validate())
-            //{
-            //    var workItems = Utility.FindWorkItemsByTitle(((MailItem)this.OutlookItem).Subject);
-            //    if (workItems.Count == 0)
-            //    {
-
-            //    }
-            //}
         }
         /// <summary> 
         /// Required designer variable.

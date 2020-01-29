@@ -12,6 +12,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using Application = Microsoft.Office.Interop.Outlook.Application;
 using Office = Microsoft.Office.Core;
 using Outlook = Microsoft.Office.Interop.Outlook;
 
@@ -53,13 +54,18 @@ namespace AzureDevopsPlugin
         private void editSettingsButton_Click(object sender, EventArgs e)
         {
             var form = new SettingsForm();
-            form.ShowDialog();
+            form.StartPosition = FormStartPosition.CenterParent;
+            form.ShowDialog(this);
             Settings.settings.Reload();
         }
 
         private void newWorkItemBtn_Click(object sender, EventArgs e)
         {
+            var app = new Application();
+            var window = app.ActiveWindow();
             var newWorkItemForm = new NewWorkItem((MailItem)this.OutlookItem);
+            newWorkItemForm.StartPosition = FormStartPosition.Manual;
+            newWorkItemForm.Location = new Point(app.ActiveWindow().Left, app.ActiveWindow().Top);
             newWorkItemForm.Show();
         }
 
@@ -71,7 +77,10 @@ namespace AzureDevopsPlugin
                 MessageBox.Show(workItems.Count + " work items found with same title as current message subject");
                 if (workItems.Count > 0)
                 {
+                    var app = new Application();
                     var form = new AddCommentToWorkItem((MailItem)this.OutlookItem, workItems);
+                    form.StartPosition = FormStartPosition.Manual;
+                    form.Location = new Point(app.ActiveWindow().Left, app.ActiveWindow().Top);
                     form.Show();
                 }
             }
