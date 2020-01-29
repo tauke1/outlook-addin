@@ -75,7 +75,7 @@ namespace AzureDevopsPlugin
             // editSettingsButton
             // 
             this.editSettingsButton.BackColor = System.Drawing.SystemColors.GradientActiveCaption;
-            this.editSettingsButton.Location = new System.Drawing.Point(238, 14);
+            this.editSettingsButton.Location = new System.Drawing.Point(459, 14);
             this.editSettingsButton.Name = "editSettingsButton";
             this.editSettingsButton.Size = new System.Drawing.Size(75, 23);
             this.editSettingsButton.TabIndex = 1;
@@ -86,7 +86,7 @@ namespace AzureDevopsPlugin
             // addCommentBtn
             // 
             this.addCommentBtn.BackColor = System.Drawing.SystemColors.GradientActiveCaption;
-            this.addCommentBtn.Location = new System.Drawing.Point(10, 58);
+            this.addCommentBtn.Location = new System.Drawing.Point(224, 14);
             this.addCommentBtn.Name = "addCommentBtn";
             this.addCommentBtn.Size = new System.Drawing.Size(190, 23);
             this.addCommentBtn.TabIndex = 2;
@@ -114,7 +114,7 @@ namespace AzureDevopsPlugin
             this.Controls.Add(this.editSettingsButton);
             this.ImeMode = System.Windows.Forms.ImeMode.NoControl;
             this.Name = "WorkItemRegion";
-            this.Size = new System.Drawing.Size(352, 140);
+            this.Size = new System.Drawing.Size(620, 140);
             this.FormRegionShowing += new System.EventHandler(this.WorkItemRegion_FormRegionShowing);
             this.FormRegionClosed += new System.EventHandler(this.WorkItemRegion_FormRegionClosed);
             this.ResumeLayout(false);
