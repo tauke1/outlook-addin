@@ -374,12 +374,6 @@
     <Compile Include="WorkItemRegion.Designer.cs">
       <DependentUpon>WorkItemRegion.cs</DependentUpon>
     </Compile>
-    <Compile Include="WysywigForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="WysywigForm.Designer.cs">
-      <DependentUpon>WysywigForm.cs</DependentUpon>
-    </Compile>
     <EmbeddedResource Include="AddCommentToWorkItem.resx">
       <DependentUpon>AddCommentToWorkItem.cs</DependentUpon>
     </EmbeddedResource>
@@ -401,9 +395,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="WorkItemRegion.resx">
       <DependentUpon>WorkItemRegion.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="WysywigForm.resx">
-      <DependentUpon>WysywigForm.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="app.config" />
     <None Include="AzureDevopsPlugin_TemporaryKey.pfx" />

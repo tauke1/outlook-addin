@@ -12,24 +12,6 @@ namespace AzureDevopsPlugin
     public sealed class Settings : ApplicationSettingsBase
     {
         private static Settings _settings;
-        
-
-        public static Settings settings 
-        { 
-            get {
-                if(_settings == null)
-                {
-                    _settings = new Settings();
-                }
-                return _settings;
-            }
-        }
-
-        private Settings()
-        {
-        }
-
-
 
         public static List<string> CategoriesList = new List<string>{
             "Check-ins verification",
@@ -45,6 +27,21 @@ namespace AzureDevopsPlugin
             "Reporting",
             "Testing"
         };
+
+        public static Settings settings 
+        { 
+            get {
+                if(_settings == null)
+                {
+                    _settings = new Settings();
+                }
+                return _settings;
+            }
+        }
+
+        private Settings()
+        {
+        }
 
         [UserScopedSetting()]
         public string OrgName

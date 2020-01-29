@@ -10,7 +10,7 @@ namespace AzureDevopsPlugin
     [System.ComponentModel.ToolboxItemAttribute(false)]
     partial class WorkItemRegion : Microsoft.Office.Tools.Outlook.FormRegionBase
     {
-        private Uri uri { get;  }
+        private Uri uri { get; }
         private string personalAccessToken { get; }
 
         public WorkItemRegion(Microsoft.Office.Interop.Outlook.FormRegion formRegion)
@@ -68,10 +68,9 @@ namespace AzureDevopsPlugin
             // editSettingsButton
             // 
             this.editSettingsButton.BackColor = System.Drawing.SystemColors.GradientActiveCaption;
-            this.editSettingsButton.Location = new System.Drawing.Point(635, 34);
-            this.editSettingsButton.Margin = new System.Windows.Forms.Padding(8, 7, 8, 7);
+            this.editSettingsButton.Location = new System.Drawing.Point(238, 14);
             this.editSettingsButton.Name = "editSettingsButton";
-            this.editSettingsButton.Size = new System.Drawing.Size(200, 55);
+            this.editSettingsButton.Size = new System.Drawing.Size(75, 23);
             this.editSettingsButton.TabIndex = 1;
             this.editSettingsButton.Text = "Edit Settings";
             this.editSettingsButton.UseVisualStyleBackColor = false;
@@ -80,10 +79,9 @@ namespace AzureDevopsPlugin
             // addCommentBtn
             // 
             this.addCommentBtn.BackColor = System.Drawing.SystemColors.GradientActiveCaption;
-            this.addCommentBtn.Location = new System.Drawing.Point(26, 138);
-            this.addCommentBtn.Margin = new System.Windows.Forms.Padding(8, 7, 8, 7);
+            this.addCommentBtn.Location = new System.Drawing.Point(10, 58);
             this.addCommentBtn.Name = "addCommentBtn";
-            this.addCommentBtn.Size = new System.Drawing.Size(508, 55);
+            this.addCommentBtn.Size = new System.Drawing.Size(190, 23);
             this.addCommentBtn.TabIndex = 2;
             this.addCommentBtn.Text = "Add comment to existing work item";
             this.addCommentBtn.UseVisualStyleBackColor = false;
@@ -92,10 +90,9 @@ namespace AzureDevopsPlugin
             // newWorkItemBtn
             // 
             this.newWorkItemBtn.BackColor = System.Drawing.SystemColors.GradientActiveCaption;
-            this.newWorkItemBtn.Location = new System.Drawing.Point(26, 34);
-            this.newWorkItemBtn.Margin = new System.Windows.Forms.Padding(8, 7, 8, 7);
+            this.newWorkItemBtn.Location = new System.Drawing.Point(10, 14);
             this.newWorkItemBtn.Name = "newWorkItemBtn";
-            this.newWorkItemBtn.Size = new System.Drawing.Size(508, 55);
+            this.newWorkItemBtn.Size = new System.Drawing.Size(190, 23);
             this.newWorkItemBtn.TabIndex = 3;
             this.newWorkItemBtn.Text = "Create New Work Item";
             this.newWorkItemBtn.UseVisualStyleBackColor = false;
@@ -103,14 +100,14 @@ namespace AzureDevopsPlugin
             // 
             // WorkItemRegion
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(16F, 31F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.newWorkItemBtn);
             this.Controls.Add(this.addCommentBtn);
             this.Controls.Add(this.editSettingsButton);
-            this.Margin = new System.Windows.Forms.Padding(8, 7, 8, 7);
+            this.ImeMode = System.Windows.Forms.ImeMode.NoControl;
             this.Name = "WorkItemRegion";
-            this.Size = new System.Drawing.Size(938, 1593);
+            this.Size = new System.Drawing.Size(352, 140);
             this.FormRegionShowing += new System.EventHandler(this.WorkItemRegion_FormRegionShowing);
             this.FormRegionClosed += new System.EventHandler(this.WorkItemRegion_FormRegionClosed);
             this.ResumeLayout(false);
