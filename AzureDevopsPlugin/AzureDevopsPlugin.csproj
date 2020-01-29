@@ -116,6 +116,9 @@
     <Reference Include="FM.LiveSwitch, Version=1.2.5.3110, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\FM.LiveSwitch.1.2.5.3110\lib\net45\FM.LiveSwitch.dll</HintPath>
     </Reference>
+    <Reference Include="HtmlAgilityPack, Version=1.11.18.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
+      <HintPath>..\packages\HtmlAgilityPack.1.11.18\lib\Net45\HtmlAgilityPack.dll</HintPath>
+    </Reference>
     <Reference Include="LiveSwitch.TextControl, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>TextConrol\LiveSwitch.TextControl.exe</HintPath>

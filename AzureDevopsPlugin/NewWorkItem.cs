@@ -9,6 +9,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -28,7 +29,7 @@ namespace AzureDevopsPlugin
             _outlookItem = outlookItem;
             InitializeComponent();
             titleTextBox.Text = _outlookItem.Subject;
-            descriptionTextBox.BodyHtml = _outlookItem.HTMLBody;
+            descriptionTextBox.BodyHtml = Utility.GetLastMessageFromMessageHTMLBody(_outlookItem.HTMLBody, outlookItem);
             foreach (var cat in Settings.settings.Categories)
             {
                 categoriesComboBox.Items.Add(cat);
@@ -85,6 +86,7 @@ namespace AzureDevopsPlugin
                     var withAttachments = attachmentsRadio.Checked;
                     var createdWorkItem = Utility.CreateWorkItem(title, description, category, _outlookItem.Attachments, withAttachments);
                     MessageBox.Show("item was created, id = " + createdWorkItem.Id);
+                    this.Close();
                 }
                 finally
                 {
@@ -109,6 +111,11 @@ namespace AzureDevopsPlugin
         private void titleTextBox_TextChanged(object sender, EventArgs e)
         {
             
+        }
+
+        private void setOriginalBodyBtn_Click(object sender, EventArgs e)
+        {
+            descriptionTextBox.BodyHtml = _outlookItem.HTMLBody;
         }
     }
 }

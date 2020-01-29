@@ -26,11 +26,12 @@ namespace AzureDevopsPlugin
             }
             _mailItem = mailItem;
             InitializeComponent();
-            commentTextBox.BodyHtml = _mailItem.HTMLBody;
+            commentTextBox.BodyHtml = Utility.GetLastMessageFromMessageHTMLBody(_mailItem.HTMLBody, mailItem);
             foreach (var workItem in workItems)
             {
                 workItemsListComboBox.Items.Add(workItem);
             }
+            workItemsListComboBox.SelectedIndex = 0;
         }
 
 
@@ -87,13 +88,40 @@ namespace AzureDevopsPlugin
                     var workItem = (Models.WorkItem)workItemsListComboBox.SelectedItem;
                     var comment = commentTextBox.BodyHtml;
                     var withAttachments = addAttachmentsToCommentRadio.Checked;
-                    Utility.AddCommentToWorkItem(workItem.Id, comment, _mailItem.Attachments, withAttachments);
+                    var commentEntity = Utility.AddCommentToWorkItem(workItem.Id, comment, _mailItem.Attachments, withAttachments);
+                    MessageBox.Show("item was created, url is " + commentEntity.Url);
+                    this.Close();
                 }
                 finally 
                 {
                     ChangeEnabledStateOfControls(true);
                 }
 
+            }
+        }
+
+        private void useOriginalMessageBodyBtn_Click(object sender, EventArgs e)
+        {
+            commentTextBox.BodyHtml = _mailItem.HTMLBody;
+        }
+
+        private void workItemsListComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            var selectedItem = (Models.WorkItem)workItemsListComboBox.SelectedItem;
+            workItemLink.Tag = $"https://dev.azure.com/{Settings.settings.OrgName}/{Settings.settings.ProjectName}/_workitems/edit/{selectedItem.Id}";
+            workItemLink.Text = selectedItem.Id.ToString();
+            workItemsListComboBox.BackColor = selectedItem.StateColor;
+        }
+
+        private void linkLabel_LinkClicked(object sender, System.Windows.Forms.LinkLabelLinkClickedEventArgs e)
+        {
+            try
+            {
+                System.Diagnostics.Process.Start((string)workItemLink.Tag);
+            }
+            catch (System.Exception ex)
+            {
+                MessageBox.Show("Unable to open link that was clicked.");
             }
         }
     }

@@ -1,12 +1,15 @@
-﻿using Microsoft.Office.Interop.Outlook;
+﻿using HtmlAgilityPack;
+using Microsoft.Office.Interop.Outlook;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
 using Microsoft.VisualStudio.Services.Common;
 using Microsoft.VisualStudio.Services.WebApi;
 using Microsoft.VisualStudio.Services.WebApi.Patch;
 using Microsoft.VisualStudio.Services.WebApi.Patch.Json;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -24,6 +27,7 @@ namespace AzureDevopsPlugin
                 var u = new Uri($"https://dev.azure.com/" + Settings.settings.OrgName);
                 VssCredentials c = new VssCredentials(new VssBasicCredential(string.Empty, Settings.settings.PatToken));
                 var connection = new VssConnection(u, c);
+
                 return connection.GetClient<WorkItemTrackingHttpClient>();
             }
 
@@ -173,13 +177,47 @@ namespace AzureDevopsPlugin
                             continue;
                         }
 
-                        list.Add(new Models.WorkItem { Id = workItem.Id.Value, State = (string)workItem.Fields["System.State"] });
+                        list.Add(new Models.WorkItem { Id = workItem.Id.Value, State = (string)workItem.Fields["System.State"], Url = workItem.Url });
                     }
                 }
 
                 return list;
             }
             throw new System.Exception("bad settings file");
+        }
+
+        public static string GetLastMessageFromMessageHTMLBody(string html, MailItem mailItem)
+        {
+            HtmlDocument htmlSnippet = new HtmlDocument();
+            htmlSnippet.LoadHtml(html);
+            var divsByWordSection1Class = htmlSnippet.DocumentNode.SelectNodes("//div[@class = 'WordSection1']");
+            if (divsByWordSection1Class?.Count > 0)
+            {
+                var borderSplitted = divsByWordSection1Class[0].OuterHtml.Split(new string[] { "<div style=\"border" }, StringSplitOptions.None);
+                if (borderSplitted.Length == 1)
+                {
+                    borderSplitted = borderSplitted[0].Split(new string[] { "<div style='border" }, StringSplitOptions.None);
+                    //if (borderSplitted.Length == 1)
+                    //{
+                    //    borderSplitted = borderSplitted[0].Split(new string[] { $"[mailto:{mailItem.SenderEmailAddress}]" }, StringSplitOptions.None);
+                    //}
+                }
+
+                return borderSplitted[0];
+            }
+
+            //var htmlSplittedByOriginalMessageLabel = html.Split(new string[] { "----Original Message-----" }, StringSplitOptions.None);
+            //if (htmlSplittedByOriginalMessageLabel.Length > 1)
+            //{
+            //    return htmlSplittedByOriginalMessageLabel[0].Trim();
+            //}
+
+            var divsByLtrDir = htmlSnippet.DocumentNode.SelectNodes("//div[@dir = 'ltr']");
+            if (divsByLtrDir?.Count > 0)
+            {
+                return divsByLtrDir[0].OuterHtml.Trim();
+            }
+            return  html.Trim();
         }
     }
 }

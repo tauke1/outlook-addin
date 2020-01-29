@@ -23,6 +23,7 @@ namespace AzureDevopsPlugin.Models
         public int Id { get; set; }
         public string State { get; set; }
 
+        public string Url { get; set; }
         public Color StateColor { get {
                 return StatesWithColors.ContainsKey(State) ? StatesWithColors[State] : Color.White;
             }

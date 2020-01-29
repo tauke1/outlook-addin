@@ -17,8 +17,15 @@ namespace AzureDevopsPlugin
             : base(Globals.Factory, formRegion)
         {
             this.InitializeComponent();
-        }
+            //if (Settings.settings.Validate())
+            //{
+            //    var workItems = Utility.FindWorkItemsByTitle(((MailItem)this.OutlookItem).Subject);
+            //    if (workItems.Count == 0)
+            //    {
 
+            //    }
+            //}
+        }
         /// <summary> 
         /// Required designer variable.
         /// </summary>
