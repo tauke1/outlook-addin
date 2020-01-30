@@ -186,10 +186,10 @@ namespace AzureDevopsPlugin
             throw new System.Exception("bad settings file");
         }
 
-        public static string GetLastMessageFromMessageHTMLBody(string html, MailItem mailItem)
+        public static string GetLastMessageFromMessageHTMLBody(MailItem mailItem)
         {
             HtmlDocument htmlSnippet = new HtmlDocument();
-            htmlSnippet.LoadHtml(html);
+            htmlSnippet.LoadHtml(mailItem.HTMLBody);
             var divsByWordSection1Class = htmlSnippet.DocumentNode.SelectNodes("//div[@class = 'WordSection1']");
             if (divsByWordSection1Class?.Count > 0)
             {
@@ -217,7 +217,7 @@ namespace AzureDevopsPlugin
             {
                 return divsByLtrDir[0].OuterHtml.Trim();
             }
-            return  html.Trim();
+            return mailItem.HTMLBody;
         }
     }
 }

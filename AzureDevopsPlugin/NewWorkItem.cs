@@ -29,7 +29,7 @@ namespace AzureDevopsPlugin
             _outlookItem = outlookItem;
             InitializeComponent();
             titleTextBox.Text = _outlookItem.Subject;
-            descriptionTextBox.BodyHtml = Utility.GetLastMessageFromMessageHTMLBody(_outlookItem.HTMLBody, outlookItem);
+            descriptionTextBox.BodyHtml = Utility.GetLastMessageFromMessageHTMLBody(outlookItem);
             foreach (var cat in Settings.settings.Categories)
             {
                 categoriesComboBox.Items.Add(cat);
@@ -105,7 +105,7 @@ namespace AzureDevopsPlugin
         {
             titleTextBox.Text = _outlookItem.Subject;
             //descriptionTextBox.Text = Regex.Replace(selObject.Body , @"^\s+$[\r\n]*", string.Empty, RegexOptions.Multiline);
-            descriptionTextBox.Text = _outlookItem.HTMLBody;
+            descriptionTextBox.Text = Utility.GetLastMessageFromMessageHTMLBody(_outlookItem);
         }
 
         private void titleTextBox_TextChanged(object sender, EventArgs e)

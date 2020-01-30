@@ -26,7 +26,7 @@ namespace AzureDevopsPlugin
             }
             _mailItem = mailItem;
             InitializeComponent();
-            commentTextBox.BodyHtml = Utility.GetLastMessageFromMessageHTMLBody(_mailItem.HTMLBody, mailItem);
+            commentTextBox.BodyHtml = Utility.GetLastMessageFromMessageHTMLBody(mailItem);
             foreach (var workItem in workItems)
             {
                 workItemsListComboBox.Items.Add(workItem);
