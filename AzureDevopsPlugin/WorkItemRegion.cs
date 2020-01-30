@@ -61,11 +61,10 @@ namespace AzureDevopsPlugin
 
         private void newWorkItemBtn_Click(object sender, EventArgs e)
         {
-            var app = new Application();
-            var window = app.ActiveWindow();
+            dynamic window = Globals.ThisAddIn.Application.ActiveWindow();
             var newWorkItemForm = new NewWorkItem((MailItem)this.OutlookItem);
             newWorkItemForm.StartPosition = FormStartPosition.Manual;
-            newWorkItemForm.Location = new Point(app.ActiveWindow().Left, app.ActiveWindow().Top);
+            MoveFormToCenter(newWorkItemForm);
             newWorkItemForm.Show();
         }
 
@@ -77,13 +76,21 @@ namespace AzureDevopsPlugin
                 MessageBox.Show(workItems.Count + " work items found with same title as current message subject");
                 if (workItems.Count > 0)
                 {
-                    var app = new Application();
+                    dynamic window = Globals.ThisAddIn.Application.ActiveWindow();
                     var form = new AddCommentToWorkItem((MailItem)this.OutlookItem, workItems);
                     form.StartPosition = FormStartPosition.Manual;
-                    form.Location = new Point(app.ActiveWindow().Left, app.ActiveWindow().Top);
+                    MoveFormToCenter(form);
                     form.Show();
                 }
             }
+        }
+
+        // Я сделал центрирования форм которые не блочат интерефейс, т.е которые вызываются через Show(), обычным способом не пашет
+        private void MoveFormToCenter(Form child)
+        {
+            child.StartPosition = FormStartPosition.Manual;
+            dynamic window = Globals.ThisAddIn.Application.ActiveWindow();
+            child.Location = new Point(window.Left + ((window.Width - child.Width) / 2) , window.Top  + ((window.Height - child.Height) / 2));
         }
     }
 }
