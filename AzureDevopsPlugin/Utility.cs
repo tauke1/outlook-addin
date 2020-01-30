@@ -14,11 +14,19 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace AzureDevopsPlugin
 {
+    /// <summary>
+    /// Utility which contains helper functions
+    /// </summary>
     public class Utility
     {
+        /// <summary>
+        /// Get TFS client
+        /// </summary>
+        /// <returns></returns>
         private static WorkItemTrackingHttpClient GetWorkItemTrackingHttpClient()
         {
             var valid = Settings.settings.Validate();
@@ -34,6 +42,11 @@ namespace AzureDevopsPlugin
             return null;
         }
 
+        /// <summary>
+        /// Create attachment in azure devops
+        /// </summary>
+        /// <param name="filePath">file to copy</param>
+        /// <returns></returns>
         public static AttachmentReference CreateAttachment(string filePath)
         {
             var workitemClient = GetWorkItemTrackingHttpClient();
@@ -50,6 +63,15 @@ namespace AzureDevopsPlugin
             throw new System.Exception("settings are not valid");
         }
 
+        /// <summary>
+        /// Create work item in TFS(Azure Devops)
+        /// </summary>
+        /// <param name="title"></param>
+        /// <param name="description"></param>
+        /// <param name="category"></param>
+        /// <param name="attachments"></param>
+        /// <param name="withAttachments"></param>
+        /// <returns></returns>
         public static WorkItem CreateWorkItem(string title, string description, string category, Attachments attachments = null, bool withAttachments = false)
         {
             var workitemClient = GetWorkItemTrackingHttpClient();
@@ -119,6 +141,14 @@ namespace AzureDevopsPlugin
             };
         }
 
+        /// <summary>
+        /// Add comment to work item
+        /// </summary>
+        /// <param name="workItemId">id of work item</param>
+        /// <param name="comment">comment text</param>
+        /// <param name="attachments">attachments</param>
+        /// <param name="withAttachments">include attachments flag</param>
+        /// <returns></returns>
         public static Comment AddCommentToWorkItem(int workItemId, string comment, Attachments attachments = null, bool withAttachments = false)
         {
             var workItemsClient = GetWorkItemTrackingHttpClient();
@@ -147,6 +177,11 @@ namespace AzureDevopsPlugin
             throw new System.Exception("Bad settings!");
         }
 
+        /// <summary>
+        /// Find work items by title
+        /// </summary>
+        /// <param name="title">work item title</param>
+        /// <returns></returns>
         public static List<Models.WorkItem> FindWorkItemsByTitle(string title)
         {
             var workitemClient = GetWorkItemTrackingHttpClient();
@@ -166,29 +201,43 @@ namespace AzureDevopsPlugin
                         "Order By [State] Asc, [Changed Date] Desc",
                 };
 
-                var result = workitemClient.QueryByWiqlAsync(wiql).Result;
-                if (result.WorkItems.Count() > 0)
+                try
                 {
-                    var workItems = workitemClient.GetWorkItemsAsync(result.WorkItems.Select(a => a.Id), new List<string> { "System.State" }).Result;
-                    foreach (var workItem in workItems)
+                    var result = workitemClient.QueryByWiqlAsync(wiql).Result;
+                    if (result.WorkItems.Count() > 0)
                     {
-                        if (!workItem.Id.HasValue)
+                        var workItems = workitemClient.GetWorkItemsAsync(result.WorkItems.Select(a => a.Id), new List<string> { "System.State" }).Result;
+                        foreach (var workItem in workItems)
                         {
-                            continue;
-                        }
+                            if (!workItem.Id.HasValue)
+                            {
+                                continue;
+                            }
 
-                        list.Add(new Models.WorkItem { Id = workItem.Id.Value, State = (string)workItem.Fields["System.State"], Url = workItem.Url });
+                            list.Add(new Models.WorkItem { Id = workItem.Id.Value, State = (string)workItem.Fields["System.State"], Url = workItem.Url });
+                        }
                     }
+
+                    return list;
+                }
+                catch (System.Exception ex)
+                {
+                    MessageBox.Show("Errors occured: message = " + ex.Message);
+                    throw;
                 }
 
-                return list;
             }
             throw new System.Exception("bad settings file");
         }
 
+        /// <summary>
+        /// Get last reply from message
+        /// </summary>
+        /// <param name="mailItem"></param>
+        /// <returns></returns>
         public static string GetLastMessageFromMessageHTMLBody(MailItem mailItem)
         {
-            HtmlDocument htmlSnippet = new HtmlDocument();
+            HtmlAgilityPack.HtmlDocument htmlSnippet = new HtmlAgilityPack.HtmlDocument();
             htmlSnippet.LoadHtml(mailItem.HTMLBody);
             var divsByWordSection1Class = htmlSnippet.DocumentNode.SelectNodes("//div[@class = 'WordSection1']");
             // Finding messages created by outlook

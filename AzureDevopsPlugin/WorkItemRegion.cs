@@ -70,7 +70,7 @@ namespace AzureDevopsPlugin
         {
             if (Settings.settings.Validate())
             {
-                var workItems = Utility.FindWorkItemsByTitle(((MailItem)this.OutlookItem).Subject);
+                var workItems = Utility.FindWorkItemsByTitle(titleTextBox.Text);
                 MessageBox.Show(workItems.Count + " work items found with same title as current message subject");
                 if (workItems.Count > 0)
                 {
@@ -88,6 +88,11 @@ namespace AzureDevopsPlugin
             dynamic window = Globals.ThisAddIn.Application.ActiveWindow();
             child.Location = new Point(window.Left + ((window.Width - child.Width) / 2) , window.Top  + ((window.Height - child.Height) / 2));
             child.Show();
+        }
+
+        private void resetButton_Click(object sender, EventArgs e)
+        {
+            titleTextBox.Text = ((MailItem)this.OutlookItem).Subject;
         }
     }
 }

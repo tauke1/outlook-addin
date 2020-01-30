@@ -37,7 +37,6 @@
             this.label1 = new System.Windows.Forms.Label();
             this.useOriginalMessageBodyBtn = new System.Windows.Forms.Button();
             this.workItemLink = new System.Windows.Forms.LinkLabel();
-            this.workItemLink.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel_LinkClicked);
             this.SuspendLayout();
             // 
             // addCommentButton
@@ -78,8 +77,8 @@
             this.workItemsListComboBox.Name = "workItemsListComboBox";
             this.workItemsListComboBox.Size = new System.Drawing.Size(214, 21);
             this.workItemsListComboBox.TabIndex = 17;
+            this.workItemsListComboBox.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.workItemsListComboBox_DrawItem);
             this.workItemsListComboBox.SelectedIndexChanged += new System.EventHandler(this.workItemsListComboBox_SelectedIndexChanged);
-            this.workItemsListComboBox.DrawItem += new System.Windows.Forms.DrawItemEventHandler(workItemsListComboBox_DrawItem);
             // 
             // commentTextBox
             // 
@@ -107,11 +106,11 @@
             // 
             // useOriginalMessageBodyBtn
             // 
-            this.useOriginalMessageBodyBtn.Location = new System.Drawing.Point(573, 390);
+            this.useOriginalMessageBodyBtn.Location = new System.Drawing.Point(502, 390);
             this.useOriginalMessageBodyBtn.Name = "useOriginalMessageBodyBtn";
-            this.useOriginalMessageBodyBtn.Size = new System.Drawing.Size(86, 23);
+            this.useOriginalMessageBodyBtn.Size = new System.Drawing.Size(157, 23);
             this.useOriginalMessageBodyBtn.TabIndex = 24;
-            this.useOriginalMessageBodyBtn.Text = "Use original message bod";
+            this.useOriginalMessageBodyBtn.Text = "Use original message body";
             this.useOriginalMessageBodyBtn.UseVisualStyleBackColor = true;
             this.useOriginalMessageBodyBtn.Click += new System.EventHandler(this.useOriginalMessageBodyBtn_Click);
             // 
@@ -124,6 +123,7 @@
             this.workItemLink.TabIndex = 25;
             this.workItemLink.TabStop = true;
             this.workItemLink.Text = "linkLabel1";
+            this.workItemLink.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel_LinkClicked);
             // 
             // AddCommentToWorkItem
             // 
@@ -138,7 +138,7 @@
             this.Controls.Add(this.addAttachmentsToCommentRadio);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.workItemsListComboBox);
-            this.Margin = new System.Windows.Forms.Padding(1, 1, 1, 1);
+            this.Margin = new System.Windows.Forms.Padding(1);
             this.Name = "AddCommentToWorkItem";
             this.Text = "AddCommentToWorkItem";
             this.ResumeLayout(false);

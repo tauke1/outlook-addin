@@ -28,10 +28,11 @@ namespace AzureDevopsPlugin
             "Testing"
         };
 
-        public static Settings settings 
-        { 
-            get {
-                if(_settings == null)
+        public static Settings settings
+        {
+            get
+            {
+                if (_settings == null)
                 {
                     _settings = new Settings();
                 }
@@ -74,7 +75,7 @@ namespace AzureDevopsPlugin
         [UserScopedSetting()]
         public List<string> Categories
         {
-            get { return (List<string>)this["Categories"];  }
+            get { return (List<string>)this["Categories"]; }
             set { this["Categories"] = value; }
         }
 
@@ -113,6 +114,17 @@ namespace AzureDevopsPlugin
             }
 
             return true;
+        }
+
+        public void Init()
+        {
+            if (Categories == null || Categories.Count == 0)
+            {
+                Categories = new List<string>();
+                CategoriesList.ForEach(cat => Categories.Add(cat));
+                Save();
+                Reload();
+            }
         }
     }
 }
