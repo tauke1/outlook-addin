@@ -191,6 +191,7 @@ namespace AzureDevopsPlugin
             HtmlDocument htmlSnippet = new HtmlDocument();
             htmlSnippet.LoadHtml(mailItem.HTMLBody);
             var divsByWordSection1Class = htmlSnippet.DocumentNode.SelectNodes("//div[@class = 'WordSection1']");
+            // Finding messages created by outlook
             if (divsByWordSection1Class?.Count > 0)
             {
                 var borderSplitted = divsByWordSection1Class[0].OuterHtml.Split(new string[] { "<div style=\"border" }, StringSplitOptions.None);
@@ -212,6 +213,7 @@ namespace AzureDevopsPlugin
             //    return htmlSplittedByOriginalMessageLabel[0].Trim();
             //}
 
+            /// finding last reply for messages sent from email
             var divsByLtrDir = htmlSnippet.DocumentNode.SelectNodes("//div[@dir = 'ltr']");
             if (divsByLtrDir?.Count > 0)
             {
