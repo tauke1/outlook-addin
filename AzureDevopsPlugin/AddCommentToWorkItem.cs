@@ -49,7 +49,7 @@ namespace AzureDevopsPlugin
             e.Graphics.DrawString(item.ToString(), ((Control)sender).Font, Brushes.Black, e.Bounds.X, e.Bounds.Y);
         }
 
-        private bool ValidatCommentFields()
+        private bool ValidateCommentFields()
         {
             var errorMessage = "";
             if (workItemsListComboBox.SelectedItem == null)
@@ -80,7 +80,7 @@ namespace AzureDevopsPlugin
 
         private void addCommentButton_Click(object sender, EventArgs e)
         {
-            if (ValidatCommentFields())
+            if (ValidateCommentFields())
             {
                 try
                 {
