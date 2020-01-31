@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace AzureDevopsPlugin.Properties {
+namespace AzureDevopsPlugin.TextControl {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]

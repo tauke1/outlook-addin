@@ -29,9 +29,9 @@ namespace AzureDevopsPlugin
             commentTextBox.BodyHtml = Utility.GetLastMessageFromMessageHTMLBody(mailItem);
             foreach (var workItem in workItems)
             {
-                workItemsListComboBox.Items.Add(workItem);
+                workItemsRadioButtonList.Items.Add(workItem);
             }
-            workItemsListComboBox.SelectedIndex = 0;
+            workItemsRadioButtonList.SelectedIndex = 0;
         }
 
 
@@ -52,7 +52,7 @@ namespace AzureDevopsPlugin
         private bool ValidateCommentFields()
         {
             var errorMessage = "";
-            if (workItemsListComboBox.SelectedItem == null)
+            if (workItemsRadioButtonList.SelectedItem == null)
             {
                 errorMessage += "field work item not selected\n";
             }
@@ -74,8 +74,8 @@ namespace AzureDevopsPlugin
         private void ChangeEnabledStateOfControls(bool enabled)
         {
             commentTextBox.Enabled = enabled;
-            workItemsListComboBox.Enabled = enabled;
-            addAttachmentsToCommentRadio.Enabled = enabled;
+            workItemsRadioButtonList.Enabled = enabled;
+            includeAttachmentsCheckBox.Enabled = enabled;
         }
 
         private void addCommentButton_Click(object sender, EventArgs e)
@@ -85,11 +85,10 @@ namespace AzureDevopsPlugin
                 try
                 {
                     ChangeEnabledStateOfControls(false);
-                    var workItem = (Models.WorkItem)workItemsListComboBox.SelectedItem;
+                    var workItem = (Models.WorkItem)workItemsRadioButtonList.SelectedItem;
                     var comment = commentTextBox.BodyHtml;
-                    var withAttachments = addAttachmentsToCommentRadio.Checked;
+                    var withAttachments = includeAttachmentsCheckBox.Checked;
                     var commentEntity = Utility.AddCommentToWorkItem(workItem.Id, comment, _mailItem.Attachments, withAttachments);
-                    MessageBox.Show("item was created, url is " + commentEntity.Url);
                     this.Close();
                 }
                 finally 
@@ -105,23 +104,25 @@ namespace AzureDevopsPlugin
             commentTextBox.BodyHtml = _mailItem.HTMLBody;
         }
 
-        private void workItemsListComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        private void workItemsRadioButtonList_SelectedIndexChanged(object sender, EventArgs e)
         {
-            var selectedItem = (Models.WorkItem)workItemsListComboBox.SelectedItem;
-            workItemLink.Tag = $"https://dev.azure.com/{Settings.settings.OrgName}/{Settings.settings.ProjectName}/_workitems/edit/{selectedItem.Id}";
-            workItemLink.Text = selectedItem.Id.ToString();
-            workItemsListComboBox.BackColor = selectedItem.StateColor;
+
         }
 
-        private void linkLabel_LinkClicked(object sender, System.Windows.Forms.LinkLabelLinkClickedEventArgs e)
+        private void workItemsRadioButtonList_MouseDoubleClick(object sender, MouseEventArgs e)
         {
-            try
+            if (Settings.settings.Validate())
             {
-                System.Diagnostics.Process.Start((string)workItemLink.Tag);
-            }
-            catch (System.Exception ex)
-            {
-                MessageBox.Show("Unable to open link that was clicked.");
+                var selected = (RadioButtonList1)sender;
+                var link = $"https://dev.azure.com/{Settings.settings.OrgName}/{Settings.settings.ProjectName}/_workitems/edit/{selected.SelectedItem.ToString()}";
+                try
+                {
+                    System.Diagnostics.Process.Start(link);
+                }
+                catch (System.Exception ex)
+                {
+                    MessageBox.Show("Unable to open link - " + link);
+                }
             }
         }
     }

@@ -36,7 +36,7 @@
     <PublishUrl>C:\Users\tauke\Documents\test\</PublishUrl>
     <InstallUrl />
     <TargetCulture>en</TargetCulture>
-    <ApplicationVersion>1.0.0.1</ApplicationVersion>
+    <ApplicationVersion>1.0.0.3</ApplicationVersion>
     <AutoIncrementApplicationRevision>true</AutoIncrementApplicationRevision>
     <UpdateEnabled>true</UpdateEnabled>
     <UpdateInterval>7</UpdateInterval>
@@ -142,9 +142,9 @@
     <Reference Include="HtmlAgilityPack, Version=1.11.18.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
       <HintPath>..\packages\HtmlAgilityPack.1.11.18\lib\Net45\HtmlAgilityPack.dll</HintPath>
     </Reference>
-    <Reference Include="LiveSwitch.TextControl, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>TextConrol\LiveSwitch.TextControl.exe</HintPath>
+    <Reference Include="Interop.SHDocVw, Version=1.1.0.0, Culture=neutral, PublicKeyToken=db7cfd3acb5ad44e, processorArchitecture=MSIL">
+      <HintPath>..\packages\WatiN.2.1.0\lib\net40\Interop.SHDocVw.dll</HintPath>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
     <Reference Include="Menulab.RichTextBox, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Menulab.RichTextBox.1.1.0\lib\Menulab.RichTextBox.dll</HintPath>
@@ -163,6 +163,10 @@
     </Reference>
     <Reference Include="Microsoft.IdentityModel.Tokens, Version=5.2.4.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.IdentityModel.Tokens.5.2.4\lib\net451\Microsoft.IdentityModel.Tokens.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.mshtml, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <HintPath>..\packages\WatiN.2.1.0\lib\net40\Microsoft.mshtml.dll</HintPath>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
     <Reference Include="Microsoft.TeamFoundation.Build.Client, Version=16.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.TeamFoundationServer.ExtendedClient.16.153.0\lib\net45\Microsoft.TeamFoundation.Build.Client.dll</HintPath>
@@ -311,6 +315,7 @@
       <HintPath>..\packages\System.Reflection.Metadata.1.5.0\lib\netstandard2.0\System.Reflection.Metadata.dll</HintPath>
     </Reference>
     <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Web.Http, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.WebApi.Core.5.2.3\lib\net45\System.Web.Http.dll</HintPath>
     </Reference>
@@ -320,6 +325,9 @@
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="WatiN.Core, Version=2.1.0.1196, Culture=neutral, PublicKeyToken=db7cfd3acb5ad44e, processorArchitecture=MSIL">
+      <HintPath>..\packages\WatiN.2.1.0\lib\net40\WatiN.Core.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Office.Tools.v4.0.Framework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
@@ -376,6 +384,15 @@
     <Compile Include="AddCommentToWorkItem.Designer.cs">
       <DependentUpon>AddCommentToWorkItem.cs</DependentUpon>
     </Compile>
+    <Compile Include="ChooseForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ChooseForm.Designer.cs">
+      <DependentUpon>ChooseForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\RadioButtonList1.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Models\WorkItem.cs" />
     <Compile Include="NewWorkItem.cs">
       <SubType>Form</SubType>
@@ -386,12 +403,66 @@
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Properties\Editor.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Editor.resx</DependentUpon>
+    </Compile>
     <Compile Include="Settings.cs" />
     <Compile Include="SettingsForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="SettingsForm.Designer.cs">
       <DependentUpon>SettingsForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TextControl\ConfigureSMTPForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TextControl\ConfigureSMTPForm.designer.cs">
+      <DependentUpon>ConfigureSMTPForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TextControl\Editor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="TextControl\Editor.designer.cs">
+      <DependentUpon>Editor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TextControl\EditorForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TextControl\EditorForm.designer.cs">
+      <DependentUpon>EditorForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TextControl\LinkDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TextControl\LinkDialog.designer.cs">
+      <DependentUpon>LinkDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TextControl\Program.cs" />
+    <Compile Include="TextControl\SearchDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TextControl\SearchDialog.designer.cs">
+      <DependentUpon>SearchDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TextControl\Settings.cs" />
+    <Compile Include="TextControl\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+    <Compile Include="TextControl\SplashForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TextControl\SplashForm.designer.cs">
+      <DependentUpon>SplashForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TextControl\TextInsertForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TextControl\TextInsertForm.designer.cs">
+      <DependentUpon>TextInsertForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Utility.cs" />
     <Compile Include="WorkItemRegion.cs">
@@ -403,8 +474,15 @@
     <EmbeddedResource Include="AddCommentToWorkItem.resx">
       <DependentUpon>AddCommentToWorkItem.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="ChooseForm.resx">
+      <DependentUpon>ChooseForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="NewWorkItem.resx">
       <DependentUpon>NewWorkItem.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Editor.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Editor.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -418,6 +496,27 @@
     </Compile>
     <EmbeddedResource Include="SettingsForm.resx">
       <DependentUpon>SettingsForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TextControl\ConfigureSMTPForm.resx">
+      <DependentUpon>ConfigureSMTPForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TextControl\Editor.resx">
+      <DependentUpon>Editor.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TextControl\EditorForm.resx">
+      <DependentUpon>EditorForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TextControl\LinkDialog.resx">
+      <DependentUpon>LinkDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TextControl\SearchDialog.resx">
+      <DependentUpon>SearchDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TextControl\SplashForm.resx">
+      <DependentUpon>SplashForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TextControl\TextInsertForm.resx">
+      <DependentUpon>TextInsertForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="WorkItemRegion.resx">
       <DependentUpon>WorkItemRegion.cs</DependentUpon>
@@ -437,6 +536,12 @@
     <Compile Include="ThisAddIn.cs">
       <SubType>Code</SubType>
     </Compile>
+    <None Include="TextControl\License.rtf" />
+    <None Include="TextControl\My Website Terms of Use.pdf" />
+    <None Include="TextControl\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
     <None Include="ThisAddIn.Designer.xml">
       <DependentUpon>ThisAddIn.cs</DependentUpon>
     </None>
@@ -444,6 +549,28 @@
       <DependentUpon>ThisAddIn.Designer.xml</DependentUpon>
     </Compile>
     <AppDesigner Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="TextControl\editor2.png" />
+    <Content Include="TextControl\privacypolicy.txt" />
+    <Content Include="TextControl\readme.txt" />
+    <Content Include="TextControl\Resources\backcolor.bmp" />
+    <Content Include="TextControl\Resources\bold.bmp" />
+    <Content Include="TextControl\Resources\cj.bmp" />
+    <Content Include="TextControl\Resources\color.bmp" />
+    <Content Include="TextControl\Resources\fj.bmp" />
+    <Content Include="TextControl\Resources\indent.bmp" />
+    <Content Include="TextControl\Resources\italic.bmp" />
+    <Content Include="TextControl\Resources\link.bmp" />
+    <Content Include="TextControl\Resources\lj.bmp" />
+    <Content Include="TextControl\Resources\ol.bmp" />
+    <Content Include="TextControl\Resources\outdent.bmp" />
+    <Content Include="TextControl\Resources\right_arrow.bmp" />
+    <Content Include="TextControl\Resources\rj.bmp" />
+    <Content Include="TextControl\Resources\underscore.bmp" />
+    <Content Include="TextControl\Resources\uol.bmp" />
+    <Content Include="TextControl\switch.ico" />
+    <Content Include="TextControl\switch.jpg" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
@@ -468,7 +595,7 @@
       <FlavorProperties GUID="{BAA0C2D2-18E2-41B9-852F-F413020CAA33}">
         <ProjectProperties HostName="Outlook" HostPackage="{29A7B9D7-A7F1-4328-8EF0-6B2D1A56B2C1}" OfficeVersion="15.0" VstxVersion="4.0" ApplicationType="Outlook" Language="cs" TemplatesPath="" DebugInfoExeName="#Software\Microsoft\Office\16.0\Outlook\InstallRoot\Path#outlook.exe" AddItemTemplatesGuid="{A58A78EB-1C92-4DDD-80CF-E8BD872ABFC4}" />
         <Host Name="Outlook" GeneratedCodeNamespace="AzureDevopsPlugin" PublishedHash="69C324AB27932AA2FBF2B7EA72250886FF164DE6" IconIndex="0">
-          <HostItem Name="ThisAddIn" Code="ThisAddIn.cs" CanonicalName="AddIn" CanActivate="false" IconIndex="1" Blueprint="ThisAddIn.Designer.xml" GeneratedCode="ThisAddIn.Designer.cs" PublishedHash="70A3AD897133A9DF980316B64F87E23F150C345C" />
+          <HostItem Name="ThisAddIn" Code="ThisAddIn.cs" CanonicalName="AddIn" PublishedHash="70A3AD897133A9DF980316B64F87E23F150C345C" CanActivate="false" IconIndex="1" Blueprint="ThisAddIn.Designer.xml" GeneratedCode="ThisAddIn.Designer.cs" />
         </Host>
       </FlavorProperties>
     </VisualStudio>

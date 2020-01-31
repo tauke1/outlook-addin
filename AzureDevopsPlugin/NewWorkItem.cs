@@ -28,8 +28,7 @@ namespace AzureDevopsPlugin
 
             _outlookItem = outlookItem;
             InitializeComponent();
-            titleTextBox.Text = _outlookItem.Subject;
-            descriptionTextBox.BodyHtml = Utility.GetLastMessageFromMessageHTMLBody(outlookItem);
+            ResetFields();
             foreach (var cat in Settings.settings.Categories)
             {
                 categoriesComboBox.Items.Add(cat);
@@ -68,9 +67,8 @@ namespace AzureDevopsPlugin
         private void ChangeEnabledStateOfControls(bool state)
         {
             categoriesComboBox.Enabled = state;
-            titleTextBox.Enabled = state;
             descriptionTextBox.Enabled = state;
-            attachmentsRadio.Enabled = state;
+            includeAttachmentsCheckBox.Enabled = state;
         }
 
         private void workItemCreateBtn_Click(object sender, EventArgs e)
@@ -83,7 +81,7 @@ namespace AzureDevopsPlugin
                     var category = categoriesComboBox.Text;
                     var title = titleTextBox.Text;
                     var description = descriptionTextBox.BodyHtml;
-                    var withAttachments = attachmentsRadio.Checked;
+                    var withAttachments = includeAttachmentsCheckBox.Checked;
                     var createdWorkItem = Utility.CreateWorkItem(title, description, category, _outlookItem.Attachments, withAttachments);
                     MessageBox.Show("item was created, id = " + createdWorkItem.Id);
                     this.Close();
@@ -103,9 +101,9 @@ namespace AzureDevopsPlugin
 
         private void ResetFields()
         {
-            titleTextBox.Text = _outlookItem.Subject;
+            titleTextBox.Text = Utility.RemoveSubjectAbbreviationsFromSubject(_outlookItem.Subject);
             //descriptionTextBox.Text = Regex.Replace(selObject.Body , @"^\s+$[\r\n]*", string.Empty, RegexOptions.Multiline);
-            descriptionTextBox.Text = Utility.GetLastMessageFromMessageHTMLBody(_outlookItem);
+            descriptionTextBox.BodyHtml = Utility.GetLastMessageFromMessageHTMLBody(_outlookItem);
         }
 
         private void titleTextBox_TextChanged(object sender, EventArgs e)

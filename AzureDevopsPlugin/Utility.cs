@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -247,10 +248,10 @@ namespace AzureDevopsPlugin
                 if (borderSplitted.Length == 1)
                 {
                     borderSplitted = borderSplitted[0].Split(new string[] { "<div style='border" }, StringSplitOptions.None);
-                    //if (borderSplitted.Length == 1)
-                    //{
-                    //    borderSplitted = borderSplitted[0].Split(new string[] { $"[mailto:{mailItem.SenderEmailAddress}]" }, StringSplitOptions.None);
-                    //}
+                    if (borderSplitted.Length == 1)
+                    {
+                        borderSplitted = borderSplitted[0].Split(new string[] { "<span id=OutlookSignature>" }, StringSplitOptions.None);
+                    }
                 }
 
                 return borderSplitted[0];
@@ -269,6 +270,27 @@ namespace AzureDevopsPlugin
                 return divsByLtrDir[0].OuterHtml.Trim();
             }
             return mailItem.HTMLBody;
+        }
+
+        public static string RemoveSubjectAbbreviationsFromSubject(string subject)
+        {
+            if (subject.Length > 3)
+            {
+                var abbr = subject.Substring(0, 3);
+                if (abbr == "RE:" || abbr == "FW:")
+                {
+                    return subject.Substring(3, subject.Length - 3).Trim();
+                }
+            }
+            return subject.Trim();
+        }
+
+        public static void MoveFormToCenterAndShow(Form form)
+        {
+            form.StartPosition = FormStartPosition.Manual;
+            dynamic window = Globals.ThisAddIn.Application.ActiveWindow();
+            form.Location = new Point(window.Left + ((window.Width - form.Width) / 2), window.Top + ((window.Height - form.Height) / 2));
+            form.Show();
         }
     }
 }

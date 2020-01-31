@@ -15,8 +15,16 @@ namespace AzureDevopsPlugin
             : base(Globals.Factory, formRegion)
         {
             this.InitializeComponent();
-            titleTextBox.Text = ((MailItem)this.OutlookItem).Subject;
             Settings.settings.Init();
+            //if (Settings.settings.Validate())
+            //{
+            //    var workItems = Utility.FindWorkItemsByTitle(Utility.RemoveSubjectAbbreviationsFromSubject(((MailItem)this.OutlookItem).Subject));
+            //    if (workItems.Count > 0)
+            //    {
+            //        var form = new AddCommentToWorkItem((MailItem)this.OutlookItem, workItems);
+            //        MoveFormToCenterAndShow(form);
+            //    }
+            //}
         }
         /// <summary> 
         /// Required designer variable.
@@ -60,16 +68,13 @@ namespace AzureDevopsPlugin
         {
             this.editSettingsButton = new System.Windows.Forms.Button();
             this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
-            this.addCommentBtn = new System.Windows.Forms.Button();
             this.newWorkItemBtn = new System.Windows.Forms.Button();
-            this.titleTextBox = new System.Windows.Forms.TextBox();
-            this.resetButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // editSettingsButton
             // 
             this.editSettingsButton.BackColor = System.Drawing.SystemColors.GradientActiveCaption;
-            this.editSettingsButton.Location = new System.Drawing.Point(438, 53);
+            this.editSettingsButton.Location = new System.Drawing.Point(252, 14);
             this.editSettingsButton.Name = "editSettingsButton";
             this.editSettingsButton.Size = new System.Drawing.Size(75, 22);
             this.editSettingsButton.TabIndex = 1;
@@ -77,21 +82,10 @@ namespace AzureDevopsPlugin
             this.editSettingsButton.UseVisualStyleBackColor = false;
             this.editSettingsButton.Click += new System.EventHandler(this.editSettingsButton_Click);
             // 
-            // addCommentBtn
-            // 
-            this.addCommentBtn.BackColor = System.Drawing.SystemColors.GradientActiveCaption;
-            this.addCommentBtn.Location = new System.Drawing.Point(231, 53);
-            this.addCommentBtn.Name = "addCommentBtn";
-            this.addCommentBtn.Size = new System.Drawing.Size(190, 23);
-            this.addCommentBtn.TabIndex = 2;
-            this.addCommentBtn.Text = "Add comment to existing work item";
-            this.addCommentBtn.UseVisualStyleBackColor = false;
-            this.addCommentBtn.Click += new System.EventHandler(this.addCommentBtn_Click);
-            // 
             // newWorkItemBtn
             // 
             this.newWorkItemBtn.BackColor = System.Drawing.SystemColors.GradientActiveCaption;
-            this.newWorkItemBtn.Location = new System.Drawing.Point(20, 53);
+            this.newWorkItemBtn.Location = new System.Drawing.Point(19, 13);
             this.newWorkItemBtn.Name = "newWorkItemBtn";
             this.newWorkItemBtn.Size = new System.Drawing.Size(190, 23);
             this.newWorkItemBtn.TabIndex = 3;
@@ -99,49 +93,25 @@ namespace AzureDevopsPlugin
             this.newWorkItemBtn.UseVisualStyleBackColor = false;
             this.newWorkItemBtn.Click += new System.EventHandler(this.newWorkItemBtn_Click);
             // 
-            // titleTextBox
-            // 
-            this.titleTextBox.Location = new System.Drawing.Point(20, 17);
-            this.titleTextBox.Name = "titleTextBox";
-            this.titleTextBox.Size = new System.Drawing.Size(401, 20);
-            this.titleTextBox.TabIndex = 4;
-            // 
-            // resetButton
-            // 
-            this.resetButton.Location = new System.Drawing.Point(438, 17);
-            this.resetButton.Name = "resetButton";
-            this.resetButton.Size = new System.Drawing.Size(75, 20);
-            this.resetButton.TabIndex = 5;
-            this.resetButton.Text = "Reset";
-            this.resetButton.UseVisualStyleBackColor = true;
-            this.resetButton.Click += new System.EventHandler(this.resetButton_Click);
-            // 
             // WorkItemRegion
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.resetButton);
-            this.Controls.Add(this.titleTextBox);
             this.Controls.Add(this.newWorkItemBtn);
-            this.Controls.Add(this.addCommentBtn);
             this.Controls.Add(this.editSettingsButton);
             this.ImeMode = System.Windows.Forms.ImeMode.NoControl;
             this.Name = "WorkItemRegion";
-            this.Size = new System.Drawing.Size(527, 167);
+            this.Size = new System.Drawing.Size(344, 52);
             this.FormRegionShowing += new System.EventHandler(this.WorkItemRegion_FormRegionShowing);
             this.FormRegionClosed += new System.EventHandler(this.WorkItemRegion_FormRegionClosed);
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
         #endregion
         private System.Windows.Forms.Button editSettingsButton;
         private FolderBrowserDialog folderBrowserDialog1;
-        private Button addCommentBtn;
         private Button newWorkItemBtn;
-        private TextBox titleTextBox;
-        private Button resetButton;
 
         public partial class WorkItemRegionFactory : Microsoft.Office.Tools.Outlook.IFormRegionFactory
         {

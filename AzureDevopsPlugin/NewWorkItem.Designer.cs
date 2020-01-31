@@ -29,7 +29,6 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(NewWorkItem));
-            this.attachmentsRadio = new System.Windows.Forms.RadioButton();
             this.workItemCreateBtn = new System.Windows.Forms.Button();
             this.categoriesComboBox = new System.Windows.Forms.ComboBox();
             this.titleTextBox = new System.Windows.Forms.TextBox();
@@ -39,18 +38,8 @@
             this.label3 = new System.Windows.Forms.Label();
             this.resetButton = new System.Windows.Forms.Button();
             this.setOriginalBodyBtn = new System.Windows.Forms.Button();
+            this.includeAttachmentsCheckBox = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
-            // 
-            // attachmentsRadio
-            // 
-            this.attachmentsRadio.AutoSize = true;
-            this.attachmentsRadio.Location = new System.Drawing.Point(204, 414);
-            this.attachmentsRadio.Name = "attachmentsRadio";
-            this.attachmentsRadio.Size = new System.Drawing.Size(121, 17);
-            this.attachmentsRadio.TabIndex = 14;
-            this.attachmentsRadio.TabStop = true;
-            this.attachmentsRadio.Text = "Include attachments";
-            this.attachmentsRadio.UseVisualStyleBackColor = true;
             // 
             // workItemCreateBtn
             // 
@@ -72,6 +61,7 @@
             // 
             // titleTextBox
             // 
+            this.titleTextBox.Enabled = false;
             this.titleTextBox.Location = new System.Drawing.Point(22, 36);
             this.titleTextBox.Name = "titleTextBox";
             this.titleTextBox.Size = new System.Drawing.Size(463, 20);
@@ -123,7 +113,7 @@
             // resetButton
             // 
             this.resetButton.Location = new System.Drawing.Point(708, 408);
-            this.resetButton.Margin = new System.Windows.Forms.Padding(1, 1, 1, 1);
+            this.resetButton.Margin = new System.Windows.Forms.Padding(1);
             this.resetButton.Name = "resetButton";
             this.resetButton.Size = new System.Drawing.Size(81, 26);
             this.resetButton.TabIndex = 17;
@@ -141,22 +131,32 @@
             this.setOriginalBodyBtn.UseVisualStyleBackColor = true;
             this.setOriginalBodyBtn.Click += new System.EventHandler(this.setOriginalBodyBtn_Click);
             // 
+            // includeAttachmentsCheckBox
+            // 
+            this.includeAttachmentsCheckBox.AutoSize = true;
+            this.includeAttachmentsCheckBox.Location = new System.Drawing.Point(208, 414);
+            this.includeAttachmentsCheckBox.Name = "includeAttachmentsCheckBox";
+            this.includeAttachmentsCheckBox.Size = new System.Drawing.Size(121, 17);
+            this.includeAttachmentsCheckBox.TabIndex = 19;
+            this.includeAttachmentsCheckBox.Text = "include attachments";
+            this.includeAttachmentsCheckBox.UseVisualStyleBackColor = true;
+            // 
             // NewWorkItem
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(826, 452);
+            this.Controls.Add(this.includeAttachmentsCheckBox);
             this.Controls.Add(this.setOriginalBodyBtn);
             this.Controls.Add(this.resetButton);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.descriptionTextBox);
-            this.Controls.Add(this.attachmentsRadio);
             this.Controls.Add(this.workItemCreateBtn);
             this.Controls.Add(this.categoriesComboBox);
             this.Controls.Add(this.titleTextBox);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.label2);
-            this.Margin = new System.Windows.Forms.Padding(1, 1, 1, 1);
+            this.Margin = new System.Windows.Forms.Padding(1);
             this.Name = "NewWorkItem";
             this.Text = "NewWorkItem";
             this.ResumeLayout(false);
@@ -165,8 +165,6 @@
         }
 
         #endregion
-
-        private System.Windows.Forms.RadioButton attachmentsRadio;
         private System.Windows.Forms.Button workItemCreateBtn;
         private System.Windows.Forms.ComboBox categoriesComboBox;
         private System.Windows.Forms.TextBox titleTextBox;
@@ -176,5 +174,6 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Button resetButton;
         private System.Windows.Forms.Button setOriginalBodyBtn;
+        private System.Windows.Forms.CheckBox includeAttachmentsCheckBox;
     }
 }

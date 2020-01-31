@@ -61,38 +61,25 @@ namespace AzureDevopsPlugin
 
         private void newWorkItemBtn_Click(object sender, EventArgs e)
         {
-            dynamic window = Globals.ThisAddIn.Application.ActiveWindow();
-            var newWorkItemForm = new NewWorkItem((MailItem)this.OutlookItem);
-            MoveFormToCenterAndShow(newWorkItemForm);
-        }
-
-        private void addCommentBtn_Click(object sender, EventArgs e)
-        {
-            if (Settings.settings.Validate())
+            try
             {
-                var workItems = Utility.FindWorkItemsByTitle(titleTextBox.Text);
-                MessageBox.Show(workItems.Count + " work items found with same title as current message subject");
+                var workItems = Utility.FindWorkItemsByTitle(Utility.RemoveSubjectAbbreviationsFromSubject(((MailItem)this.OutlookItem).Subject));
                 if (workItems.Count > 0)
                 {
-                    dynamic window = Globals.ThisAddIn.Application.ActiveWindow();
-                    var form = new AddCommentToWorkItem((MailItem)this.OutlookItem, workItems);
-                    MoveFormToCenterAndShow(form);
+                    var form = new ChooseForm(workItems, (MailItem)this.OutlookItem);
+                    Utility.MoveFormToCenterAndShow(form);
+                }
+                else
+                {
+                    newWorkItemBtn.Enabled = false;
+                    var newWorkItemForm = new NewWorkItem((MailItem)this.OutlookItem);
+                    Utility.MoveFormToCenterAndShow(newWorkItemForm);
                 }
             }
-        }
-
-        // Я сделал центрирования форм которые не блочат интерефейс, т.е которые вызываются через Show(), обычным способом не пашет
-        private void MoveFormToCenterAndShow(Form child)
-        {
-            child.StartPosition = FormStartPosition.Manual;
-            dynamic window = Globals.ThisAddIn.Application.ActiveWindow();
-            child.Location = new Point(window.Left + ((window.Width - child.Width) / 2) , window.Top  + ((window.Height - child.Height) / 2));
-            child.Show();
-        }
-
-        private void resetButton_Click(object sender, EventArgs e)
-        {
-            titleTextBox.Text = ((MailItem)this.OutlookItem).Subject;
+            finally
+            {
+                newWorkItemBtn.Enabled = true;
+            }
         }
     }
 }
