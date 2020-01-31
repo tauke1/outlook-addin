@@ -13,6 +13,7 @@ namespace AzureDevopsPlugin
 {
     public partial class ThisAddIn
     {
+
         private void ThisAddIn_Startup(object sender, System.EventArgs e)
         {
         }
@@ -23,6 +24,10 @@ namespace AzureDevopsPlugin
             //    must run when Outlook shuts down, see https://go.microsoft.com/fwlink/?LinkId=506785
         }
 
+        protected override Microsoft.Office.Core.IRibbonExtensibility CreateRibbonExtensibilityObject()
+        {
+            return new Ribbon();
+        }
         #region VSTO generated code
 
         /// <summary>

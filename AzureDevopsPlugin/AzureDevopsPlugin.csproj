@@ -396,6 +396,9 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Editor.resx</DependentUpon>
     </Compile>
+    <Compile Include="Ribbon.cs">
+      <XmlRibbon>true</XmlRibbon>
+    </Compile>
     <Compile Include="Settings.cs" />
     <Compile Include="SettingsForm.cs">
       <SubType>Form</SubType>
@@ -453,12 +456,6 @@
       <DependentUpon>TextInsertForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Utility.cs" />
-    <Compile Include="WorkItemRegion.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="WorkItemRegion.Designer.cs">
-      <DependentUpon>WorkItemRegion.cs</DependentUpon>
-    </Compile>
     <EmbeddedResource Include="AddCommentToWorkItem.resx">
       <DependentUpon>AddCommentToWorkItem.cs</DependentUpon>
     </EmbeddedResource>
@@ -506,9 +503,6 @@
     <EmbeddedResource Include="TextControl\TextInsertForm.resx">
       <DependentUpon>TextInsertForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="WorkItemRegion.resx">
-      <DependentUpon>WorkItemRegion.cs</DependentUpon>
-    </EmbeddedResource>
     <None Include="app.config" />
     <None Include="AzureDevopsPlugin_TemporaryKey.pfx" />
     <None Include="packages.config" />
@@ -539,6 +533,7 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Ribbon.xml" />
     <Content Include="TextControl\editor2.png" />
     <Content Include="TextControl\privacypolicy.txt" />
     <Content Include="TextControl\readme.txt" />
@@ -559,6 +554,9 @@
     <Content Include="TextControl\Resources\uol.bmp" />
     <Content Include="TextControl\switch.ico" />
     <Content Include="TextControl\switch.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Interfaces\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

@@ -19,6 +19,11 @@ namespace AzureDevopsPlugin
     {
         private readonly MailItem _outlookItem;
 
+        public NewWorkItem()
+        { 
+            
+        }
+
         public NewWorkItem(MailItem outlookItem)
         {
             if (outlookItem == null)

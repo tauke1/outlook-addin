@@ -30,8 +30,6 @@
         {
             this.saveButton = new System.Windows.Forms.Button();
             this.orgNameTextBox = new System.Windows.Forms.TextBox();
-            this.projectNameTextBox = new System.Windows.Forms.TextBox();
-            this.patTokenTextBox = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
@@ -39,6 +37,8 @@
             this.label4 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.workItemTypeTextBox = new System.Windows.Forms.TextBox();
+            this.projectNameTextBox = new System.Windows.Forms.MaskedTextBox();
+            this.patTokenTextBox = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // saveButton
@@ -58,20 +58,6 @@
             this.orgNameTextBox.Name = "orgNameTextBox";
             this.orgNameTextBox.Size = new System.Drawing.Size(392, 20);
             this.orgNameTextBox.TabIndex = 1;
-            // 
-            // projectNameTextBox
-            // 
-            this.projectNameTextBox.Location = new System.Drawing.Point(127, 78);
-            this.projectNameTextBox.Name = "projectNameTextBox";
-            this.projectNameTextBox.Size = new System.Drawing.Size(392, 20);
-            this.projectNameTextBox.TabIndex = 2;
-            // 
-            // patTokenTextBox
-            // 
-            this.patTokenTextBox.Location = new System.Drawing.Point(127, 115);
-            this.patTokenTextBox.Name = "patTokenTextBox";
-            this.patTokenTextBox.Size = new System.Drawing.Size(392, 20);
-            this.patTokenTextBox.TabIndex = 3;
             // 
             // label1
             // 
@@ -132,11 +118,28 @@
             this.workItemTypeTextBox.Size = new System.Drawing.Size(392, 20);
             this.workItemTypeTextBox.TabIndex = 9;
             // 
+            // projectNameTextBox
+            // 
+            this.projectNameTextBox.Location = new System.Drawing.Point(127, 78);
+            this.projectNameTextBox.Name = "projectNameTextBox";
+            this.projectNameTextBox.Size = new System.Drawing.Size(392, 20);
+            this.projectNameTextBox.TabIndex = 11;
+            // 
+            // patTokenTextBox
+            // 
+            this.patTokenTextBox.Location = new System.Drawing.Point(127, 115);
+            this.patTokenTextBox.Name = "patTokenTextBox";
+            this.patTokenTextBox.PasswordChar = '*';
+            this.patTokenTextBox.Size = new System.Drawing.Size(392, 20);
+            this.patTokenTextBox.TabIndex = 12;
+            // 
             // SettingsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(557, 295);
+            this.Controls.Add(this.patTokenTextBox);
+            this.Controls.Add(this.projectNameTextBox);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.workItemTypeTextBox);
             this.Controls.Add(this.label4);
@@ -144,8 +147,6 @@
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.patTokenTextBox);
-            this.Controls.Add(this.projectNameTextBox);
             this.Controls.Add(this.orgNameTextBox);
             this.Controls.Add(this.saveButton);
             this.Name = "SettingsForm";
@@ -159,8 +160,6 @@
 
         private System.Windows.Forms.Button saveButton;
         private System.Windows.Forms.TextBox orgNameTextBox;
-        private System.Windows.Forms.TextBox projectNameTextBox;
-        private System.Windows.Forms.TextBox patTokenTextBox;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label3;
@@ -168,5 +167,7 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.TextBox workItemTypeTextBox;
+        private System.Windows.Forms.MaskedTextBox projectNameTextBox;
+        private System.Windows.Forms.TextBox patTokenTextBox;
     }
 }

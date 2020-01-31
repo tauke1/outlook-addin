@@ -183,7 +183,7 @@ namespace AzureDevopsPlugin
         /// </summary>
         /// <param name="title">work item title</param>
         /// <returns></returns>
-        public static List<Models.WorkItem> FindWorkItemsByTitle(string title)
+        public static async Task<List<Models.WorkItem>> FindWorkItemsByTitle(string title)
         {
             var workitemClient = GetWorkItemTrackingHttpClient();
             if (workitemClient != null)
@@ -204,7 +204,7 @@ namespace AzureDevopsPlugin
 
                 try
                 {
-                    var result = workitemClient.QueryByWiqlAsync(wiql).Result;
+                    var result = await workitemClient.QueryByWiqlAsync(wiql);
                     if (result.WorkItems.Count() > 0)
                     {
                         var workItems = workitemClient.GetWorkItemsAsync(result.WorkItems.Select(a => a.Id), new List<string> { "System.State", "System.Title" }).Result;
