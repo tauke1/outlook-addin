@@ -197,7 +197,7 @@ namespace AzureDevopsPlugin
                         "From WorkItems " +
                         "Where [Work Item Type] = '" + Settings.settings.WorkItemType + "' " +
                         "And [System.TeamProject] = '" + Settings.settings.ProjectName + "' " +
-                        "And [System.Title] = '" + title.Replace("'", "''") + "' " +
+                        "And [System.Title] Contains '" + title.Replace("'", "''") + "' " +
                         "And [System.State] <> 'Closed' " +
                         "Order By [State] Asc, [Changed Date] Desc",
                 };
@@ -207,7 +207,7 @@ namespace AzureDevopsPlugin
                     var result = workitemClient.QueryByWiqlAsync(wiql).Result;
                     if (result.WorkItems.Count() > 0)
                     {
-                        var workItems = workitemClient.GetWorkItemsAsync(result.WorkItems.Select(a => a.Id), new List<string> { "System.State" }).Result;
+                        var workItems = workitemClient.GetWorkItemsAsync(result.WorkItems.Select(a => a.Id), new List<string> { "System.State", "System.Title" }).Result;
                         foreach (var workItem in workItems)
                         {
                             if (!workItem.Id.HasValue)
@@ -215,7 +215,7 @@ namespace AzureDevopsPlugin
                                 continue;
                             }
 
-                            list.Add(new Models.WorkItem { Id = workItem.Id.Value, State = (string)workItem.Fields["System.State"], Url = workItem.Url });
+                            list.Add(new Models.WorkItem { Id = workItem.Id.Value, Title = (string)workItem.Fields["System.Title"], State = (string)workItem.Fields["System.State"], Url = workItem.Url });
                         }
                     }
 

@@ -21,6 +21,9 @@ namespace AzureDevopsPlugin.Models
         };
 
         public int Id { get; set; }
+
+        public string Title { get; set; }
+
         public string State { get; set; }
 
         public string Url { get; set; }
@@ -30,7 +33,7 @@ namespace AzureDevopsPlugin.Models
         }
         public override string ToString()
         {
-            return Id.ToString();
+            return Id + " " + Title;
         }
     }
 }

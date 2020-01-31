@@ -104,6 +104,8 @@
             // workItemsRadioButtonList
             // 
             this.workItemsRadioButtonList.FormattingEnabled = true;
+            this.workItemsRadioButtonList.HorizontalExtent = 300;
+            this.workItemsRadioButtonList.HorizontalScrollbar = true;
             this.workItemsRadioButtonList.Location = new System.Drawing.Point(3, 38);
             this.workItemsRadioButtonList.Name = "workItemsRadioButtonList";
             this.workItemsRadioButtonList.Size = new System.Drawing.Size(220, 289);

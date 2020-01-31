@@ -113,16 +113,20 @@ namespace AzureDevopsPlugin
         {
             if (Settings.settings.Validate())
             {
-                var selected = (RadioButtonList1)sender;
-                var link = $"https://dev.azure.com/{Settings.settings.OrgName}/{Settings.settings.ProjectName}/_workitems/edit/{selected.SelectedItem.ToString()}";
-                try
+                if (workItemsRadioButtonList.SelectedItem != null)
                 {
-                    System.Diagnostics.Process.Start(link);
+                    var selectedItem = (Models.WorkItem)workItemsRadioButtonList.SelectedItem;
+                    var link = $"https://dev.azure.com/{Settings.settings.OrgName}/{Settings.settings.ProjectName}/_workitems/edit/{selectedItem.Id}";
+                    try
+                    {
+                        System.Diagnostics.Process.Start(link);
+                    }
+                    catch (System.Exception ex)
+                    {
+                        MessageBox.Show("Unable to open link - " + link);
+                    }
                 }
-                catch (System.Exception ex)
-                {
-                    MessageBox.Show("Unable to open link - " + link);
-                }
+                
             }
         }
     }
