@@ -31,7 +31,7 @@ namespace AzureDevopsPlugin
             _workItems = workItems;
             InitializeComponent();
             userLabel.Text = "There are found " + workItems.Count + " work items with mail subject title";
-            userLabel.Text += "\n work items ids - " + string.Join(", ", workItems.Select(a=>a.Id.ToString()).ToArray());
+            userLabel.Text += "\nwork items ids - " + string.Join(", ", workItems.Select(a=>a.Id.ToString()).ToArray());
         }
 
         private void createNewWorkItemBtn_Click(object sender, EventArgs e)

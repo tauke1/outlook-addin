@@ -156,7 +156,7 @@ namespace AzureDevopsPlugin
             if (workItemsClient != null)
             {
                 var workItem = workItemsClient.GetWorkItemAsync(workItemId).Result;
-                if (withAttachments && attachments != null)
+                if (withAttachments && attachments?.Count > 0)
                 {
                     var updateDocument = new JsonPatchDocument();
                     var i = 1;
