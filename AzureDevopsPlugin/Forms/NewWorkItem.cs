@@ -13,7 +13,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace AzureDevopsPlugin
+namespace AzureDevopsPlugin.Forms
 {
     public partial class NewWorkItem : Form
     {
@@ -93,6 +93,7 @@ namespace AzureDevopsPlugin
                 }
                 finally
                 {
+                    Globals.ThisAddIn.ChangeTaskPaneVisibility(false);
                     ChangeEnabledStateOfControls(true);
                 }
                 

@@ -79,7 +79,7 @@ namespace AzureDevopsPlugin
             set { this["Categories"] = value; }
         }
 
-        public bool Validate()
+        public bool Validate(bool showMessage = true)
         {
             var errorMessage = "";
             if (string.IsNullOrEmpty(this.WorkItemType))
@@ -109,7 +109,10 @@ namespace AzureDevopsPlugin
 
             if (!string.IsNullOrEmpty(errorMessage))
             {
-                MessageBox.Show(errorMessage);
+                if (showMessage)
+                { 
+                    MessageBox.Show(errorMessage);
+                }
                 return false;
             }
 

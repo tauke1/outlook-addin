@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace AzureDevopsPlugin
+namespace AzureDevopsPlugin.Forms
 {
     public partial class SettingsForm : Form
     {

@@ -1,4 +1,4 @@
-﻿namespace AzureDevopsPlugin
+﻿namespace AzureDevopsPlugin.Forms
 {
     partial class SettingsForm
     {
@@ -150,7 +150,7 @@
             this.Controls.Add(this.orgNameTextBox);
             this.Controls.Add(this.saveButton);
             this.Name = "SettingsForm";
-            this.Text = "SettingsForm";
+            this.Text = "Edit Settings";
             this.ResumeLayout(false);
             this.PerformLayout();
 

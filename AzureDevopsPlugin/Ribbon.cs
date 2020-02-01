@@ -1,4 +1,5 @@
-﻿using Microsoft.Office.Interop.Outlook;
+﻿using AzureDevopsPlugin.Forms;
+using Microsoft.Office.Interop.Outlook;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -51,6 +52,7 @@ namespace AzureDevopsPlugin
 
         public void EditSettings(Office.IRibbonControl control)
         {
+            Globals.ThisAddIn.ChangeTaskPaneVisibility(false);
             var form = new SettingsForm();
             form.StartPosition = FormStartPosition.CenterParent;
             form.ShowDialog();
@@ -62,43 +64,44 @@ namespace AzureDevopsPlugin
             return _createWorkItemButtonEnabled;
         }
 
-        
-
         public void CreateWorkItem(Office.IRibbonControl control)
         {
-            // Determine subject of selected item
-            Explorer explorer = Globals.ThisAddIn.Application.ActiveExplorer();
-            if (explorer != null && explorer.Selection != null && explorer.Selection.Count > 0)
+            if (Settings.settings.Validate())
             {
-                var mailItem = explorer.Selection[1] as MailItem;
-                if (mailItem == null)
+                // Determine subject of selected item
+                Explorer explorer = Globals.ThisAddIn.Application.ActiveExplorer();
+                if (explorer != null && explorer.Selection != null && explorer.Selection.Count > 0)
                 {
-                    return;
+                    var mailItem = explorer.Selection[1] as MailItem;
+                    if (mailItem == null)
+                    {
+                        return;
+                    }
+
+                    _createWorkItemButtonEnabled = false;
+                    ribbon.InvalidateControl("CreateWorkItem");
+                    Task.Run(() =>
+                    {
+                        try
+                        {
+                            var workItems = Utility.FindWorkItemsByTitle(Utility.RemoveSubjectAbbreviationsFromSubject(mailItem.Subject)).Result;
+                            synchronizationContext.Post(new SendOrPostCallback(o => Globals.ThisAddIn.FillTaskPane(workItems, mailItem)), null);
+                            //synchronizationContext.Send(new SendOrPostCallback(o => CreateNewWorkItemsFormOrChooseForm(workItems, mailItem)), null);
+                        }
+                        finally
+                        {
+                            synchronizationContext.Send(new SendOrPostCallback(o => EnableCreateNewWorkItemButton()), null);
+                        }
+                    });
                 }
-
-                _createWorkItemButtonEnabled = false;
-                ribbon.InvalidateControl("CreateWorkItem");
-                Task.Run(() =>
-                {
-                    try
-                    {
-                        var workItems = Utility.FindWorkItemsByTitle(Utility.RemoveSubjectAbbreviationsFromSubject(mailItem.Subject)).Result;
-                        synchronizationContext.Send(new SendOrPostCallback(o => CreateNewWorkItemsFormOrChooseForm(workItems, mailItem)), null);
-                    }
-                    finally
-                    {
-                        synchronizationContext.Send(new SendOrPostCallback(o=> EnableCreateNewWorkItemButton()), null);
-                    }
-                });
             }
-
         }
 
-        private void CreateNewWorkItemsFormOrChooseForm(List<Models.WorkItem> workItems, MailItem mailItem)
-        {
-            Form form = workItems?.Count > 0 ? (Form)(new ChooseForm(workItems, mailItem)) : new NewWorkItem(mailItem);
-            Utility.MoveFormToCenterAndShow(form);
-        }
+        //private void CreateNewWorkItemsFormOrChooseForm(List<Models.WorkItem> workItems, MailItem mailItem)
+        //{
+        //    Form form = workItems?.Count > 0 ? (Form)(new ChooseForm(workItems, mailItem)) : new NewWorkItem(mailItem);
+        //    Utility.MoveFormToCenterAndShow(form);
+        //}
 
         private async void EnableCreateNewWorkItemButton()
         {

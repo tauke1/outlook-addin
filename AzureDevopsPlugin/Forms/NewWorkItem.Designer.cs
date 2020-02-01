@@ -1,4 +1,4 @@
-﻿namespace AzureDevopsPlugin
+﻿namespace AzureDevopsPlugin.Forms
 {
     partial class NewWorkItem
     {

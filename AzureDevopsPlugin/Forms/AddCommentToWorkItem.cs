@@ -9,12 +9,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace AzureDevopsPlugin
+namespace AzureDevopsPlugin.Forms
 {
     public partial class AddCommentToWorkItem : Form
     {
         private readonly MailItem _mailItem;
-        public AddCommentToWorkItem(MailItem mailItem, List<Models.WorkItem> workItems)
+        public AddCommentToWorkItem(MailItem mailItem, List<Models.WorkItem> workItems, int selectedRow)
         {
             if (workItems == null || workItems.Count == 0)
             {
@@ -31,7 +31,7 @@ namespace AzureDevopsPlugin
             {
                 workItemsRadioButtonList.Items.Add(workItem);
             }
-            workItemsRadioButtonList.SelectedIndex = 0;
+            workItemsRadioButtonList.SelectedIndex = selectedRow;
         }
 
 
@@ -93,6 +93,7 @@ namespace AzureDevopsPlugin
                 }
                 finally 
                 {
+                    Globals.ThisAddIn.ChangeTaskPaneVisibility(false);
                     ChangeEnabledStateOfControls(true);
                 }
 

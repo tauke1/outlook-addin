@@ -366,26 +366,20 @@
     can be found.
   -->
   <ItemGroup>
-    <Compile Include="AddCommentToWorkItem.cs">
+    <Compile Include="Forms\AddCommentToWorkItem.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="AddCommentToWorkItem.Designer.cs">
+    <Compile Include="Forms\AddCommentToWorkItem.Designer.cs">
       <DependentUpon>AddCommentToWorkItem.cs</DependentUpon>
-    </Compile>
-    <Compile Include="ChooseForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="ChooseForm.Designer.cs">
-      <DependentUpon>ChooseForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Controls\RadioButtonList1.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Models\WorkItem.cs" />
-    <Compile Include="NewWorkItem.cs">
+    <Compile Include="Forms\NewWorkItem.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="NewWorkItem.Designer.cs">
+    <Compile Include="Forms\NewWorkItem.Designer.cs">
       <DependentUpon>NewWorkItem.cs</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -400,11 +394,17 @@
       <XmlRibbon>true</XmlRibbon>
     </Compile>
     <Compile Include="Settings.cs" />
-    <Compile Include="SettingsForm.cs">
+    <Compile Include="Forms\SettingsForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="SettingsForm.Designer.cs">
+    <Compile Include="Forms\SettingsForm.Designer.cs">
       <DependentUpon>SettingsForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\ChooseUserControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\ChooseUserControl.Designer.cs">
+      <DependentUpon>ChooseUserControl.cs</DependentUpon>
     </Compile>
     <Compile Include="TextControl\ConfigureSMTPForm.cs">
       <SubType>Form</SubType>
@@ -456,13 +456,10 @@
       <DependentUpon>TextInsertForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Utility.cs" />
-    <EmbeddedResource Include="AddCommentToWorkItem.resx">
+    <EmbeddedResource Include="Forms\AddCommentToWorkItem.resx">
       <DependentUpon>AddCommentToWorkItem.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="ChooseForm.resx">
-      <DependentUpon>ChooseForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="NewWorkItem.resx">
+    <EmbeddedResource Include="Forms\NewWorkItem.resx">
       <DependentUpon>NewWorkItem.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Editor.resx">
@@ -479,8 +476,11 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
-    <EmbeddedResource Include="SettingsForm.resx">
+    <EmbeddedResource Include="Forms\SettingsForm.resx">
       <DependentUpon>SettingsForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\ChooseUserControl.resx">
+      <DependentUpon>ChooseUserControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="TextControl\ConfigureSMTPForm.resx">
       <DependentUpon>ConfigureSMTPForm.cs</DependentUpon>
@@ -555,9 +555,7 @@
     <Content Include="TextControl\switch.ico" />
     <Content Include="TextControl\switch.jpg" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Interfaces\" />
-  </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
