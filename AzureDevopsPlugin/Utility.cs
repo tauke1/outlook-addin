@@ -277,7 +277,7 @@ namespace AzureDevopsPlugin
             if (subject.Length > 3)
             {
                 var abbr = subject.Substring(0, 3);
-                if (abbr == "RE:" || abbr == "FW:")
+                if (abbr.ToLower() == "re:" || abbr.ToLower() == "fw:")
                 {
                     return subject.Substring(3, subject.Length - 3).Trim();
                 }

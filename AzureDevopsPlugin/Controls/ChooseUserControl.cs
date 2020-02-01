@@ -63,5 +63,22 @@ namespace AzureDevopsPlugin.Controls
             var form = new AddCommentToWorkItem(_mailItem, _workItems, workItemGridView.CurrentCell.RowIndex);
             Utility.MoveFormToCenterAndShow(form);
         }
+
+        private void workItemGridView_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (Settings.settings.Validate())
+            {
+                var selectedItem = workItemGridView.Rows[workItemGridView.CurrentCell.RowIndex].Cells["Id"].Value;
+                var link = $"https://dev.azure.com/{Settings.settings.OrgName}/{Settings.settings.ProjectName}/_workitems/edit/{selectedItem}";
+                try
+                {
+                    System.Diagnostics.Process.Start(link);
+                }
+                catch (System.Exception ex)
+                {
+                    MessageBox.Show("Unable to open link - " + link);
+                }
+            }
+        }
     }
 }

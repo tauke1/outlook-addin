@@ -82,6 +82,7 @@
             this.workItemGridView.ShowRowErrors = false;
             this.workItemGridView.Size = new System.Drawing.Size(248, 302);
             this.workItemGridView.TabIndex = 3;
+            this.workItemGridView.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.workItemGridView_CellDoubleClick);
             // 
             // ChooseUserControl
             // 
