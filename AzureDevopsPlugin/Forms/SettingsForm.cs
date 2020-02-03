@@ -77,6 +77,7 @@ namespace AzureDevopsPlugin.Forms
                         Settings.settings.PatToken = patToken;
                         Settings.settings.WorkItemType = workItemType;
                         Settings.settings.Save();
+                        Settings.settings.SendSettingsChangedNotification();
                         this.Close();
                     }
                 }

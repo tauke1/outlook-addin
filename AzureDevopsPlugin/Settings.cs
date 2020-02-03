@@ -97,13 +97,26 @@ namespace AzureDevopsPlugin
             if (!string.IsNullOrEmpty(errorMessage))
             {
                 if (showMessage)
-                { 
+                {
                     MessageBox.Show(errorMessage, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
                 return false;
             }
 
             return true;
+        }
+
+        public delegate void SettingsChangedFunc();
+        private SettingsChangedFunc SettingsChanged;
+
+        public void SendSettingsChangedNotification()
+        {
+            SettingsChanged?.Invoke();
+        }
+
+        public void SetSettingsChangedNotification(SettingsChangedFunc func)
+        {
+            SettingsChanged = func;
         }
     }
 }

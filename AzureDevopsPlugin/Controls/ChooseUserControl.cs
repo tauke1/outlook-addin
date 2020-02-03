@@ -56,6 +56,8 @@ namespace AzureDevopsPlugin.Controls
                 workItemGridView.Rows[i].Cells[0].Style.BackColor = workItem.StateColor;
                 i++;
             }
+
+            workItemGridView.CurrentCell = workItemGridView.Rows[0].Cells[2];
         }
 
         private void newWorkItemBtn_Click(object sender, EventArgs e)

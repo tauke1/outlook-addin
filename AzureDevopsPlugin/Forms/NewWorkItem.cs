@@ -20,8 +20,8 @@ namespace AzureDevopsPlugin.Forms
         private readonly MailItem _outlookItem;
 
         public NewWorkItem()
-        { 
-            
+        {
+
         }
 
         public NewWorkItem(MailItem outlookItem)
@@ -41,6 +41,18 @@ namespace AzureDevopsPlugin.Forms
             }
 
             categoriesComboBox.SelectedIndex = 0;
+            Settings.settings.SetSettingsChangedNotification(() =>
+            {
+                categoriesComboBox.Items.Clear();
+                if (Settings.settings.CategoryCustomFieldValues?.Count > 0)
+                {
+                    foreach (var item in Settings.settings.CategoryCustomFieldValues)
+                    {
+                        categoriesComboBox.Items.Add(item);
+                    }
+                    categoriesComboBox.SelectedIndex = 0;
+                }
+            });
         }
 
         private bool ValidateWorkItemFields()
@@ -101,7 +113,7 @@ namespace AzureDevopsPlugin.Forms
                     Globals.ThisAddIn.ChangeTaskPaneVisibility(false);
                     ChangeEnabledStateOfControls(true);
                 }
-                
+
             }
         }
 
@@ -119,7 +131,7 @@ namespace AzureDevopsPlugin.Forms
 
         private void titleTextBox_TextChanged(object sender, EventArgs e)
         {
-            
+
         }
 
         private void setOriginalBodyBtn_Click(object sender, EventArgs e)
