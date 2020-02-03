@@ -4,7 +4,7 @@
         <tabs>
             <tab idMso="TabMail">
                 <group id="group1" label="Azure Devops">
-                    <button id="CreateWorkItem" imageMso="OutlineExpand" label="Create Work Item" onAction="CreateWorkItem" getEnabled="CreateWorkItemButton_GetEnabled" />
+                    <button id="CreateWorkItem" imageMso="OutlineExpand" label="Azure Devops" onAction="CreateWorkItem" getEnabled="CreateWorkItemButton_GetEnabled" />
                     <button id="Settings" imageMso="EditDocument" label="Settings" onAction="EditSettings" />
                 </group>
             </tab>

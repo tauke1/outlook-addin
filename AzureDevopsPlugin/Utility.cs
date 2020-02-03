@@ -29,18 +29,22 @@ namespace AzureDevopsPlugin
         /// Get TFS client
         /// </summary>
         /// <returns></returns>
-        private static T GetTFSHttpClient<T>() where T: VssHttpClientBase
+        public static T GetTFSHttpClient<T>() where T: VssHttpClientBase
         {
             var valid = Settings.settings.Validate();
             if (valid)
             {
-                var u = new Uri($"https://dev.azure.com/" + Settings.settings.OrgName);
-                VssCredentials c = new VssCredentials(new VssBasicCredential(string.Empty, Settings.settings.PatToken));
-                var connection = new VssConnection(u, c);
-                return connection.GetClient<T>();
+                return GetTFSHttpClient<T>(Settings.settings.OrgName, Settings.settings.PatToken);
             }
-
             return null;
+        }
+
+        public static T GetTFSHttpClient<T>(string orgName, string PatToken) where T : VssHttpClientBase
+        {
+            var u = new Uri($"https://dev.azure.com/" + orgName);
+            VssCredentials c = new VssCredentials(new VssBasicCredential(string.Empty, PatToken));
+            var connection = new VssConnection(u, c);
+            return connection.GetClient<T>();
         }
 
         /// <summary>
@@ -296,12 +300,17 @@ namespace AzureDevopsPlugin
         {
             var witClient = GetTFSHttpClient<WorkItemTrackingHttpClient>();
             var witTrackingClient = GetTFSHttpClient<WorkItemTrackingProcessHttpClient>();
+            return GetCustomFieldPickListValue(fieldName, witClient, witTrackingClient);
+        }
+
+        public static IList<string> GetCustomFieldPickListValue(string fieldName, WorkItemTrackingHttpClient witClient, WorkItemTrackingProcessHttpClient witTrackingClient)
+        {
             if (witClient == null && witTrackingClient == null)
             {
                 throw new System.Exception("bad configs file");
             }
 
-            var field =  witClient.GetFieldAsync("Custom." + fieldName).Result;
+            var field = witClient.GetFieldAsync("Custom." + fieldName).Result;
             if (field.IsPicklist)
             {
                 var pickList = witTrackingClient.GetListAsync(field.PicklistId.Value).Result;
@@ -311,6 +320,57 @@ namespace AzureDevopsPlugin
             {
                 throw new System.Exception(fieldName + " field is not picklist");
             }
+        }
+
+        public static bool ValidateVssSettings()
+        {
+            if (!Settings.settings.Validate())
+            {
+                return false;
+            }
+
+            var witClient = GetTFSHttpClient<WorkItemTrackingHttpClient>();
+            var witProcessClient = GetTFSHttpClient<WorkItemTrackingProcessHttpClient>();
+            return ValidateVssSettings(Settings.settings.WorkItemType, Settings.settings.ProjectName, Settings.settings.CategoryCustomFieldName, witClient, witProcessClient);
+        }
+
+        public static bool ValidateVssSettings(string workItemType, string projectName, string customCategoryField, WorkItemTrackingHttpClient witClient, WorkItemTrackingProcessHttpClient witProcessClient)
+        {
+            if (string.IsNullOrEmpty(workItemType) || string.IsNullOrEmpty(projectName) || string.IsNullOrEmpty(customCategoryField) || witClient == null || witProcessClient == null)
+            {
+                throw new ArgumentNullException("bad arguments");
+            }
+            var errorMessage = "";
+            try
+            {
+                witClient.GetWorkItemTypeAsync(projectName, workItemType).Wait();
+                var customFieldValues = Utility.GetCustomFieldPickListValue(customCategoryField, witClient, witProcessClient);
+                Settings.settings.CategoryCustomFieldValues = customFieldValues;
+            }
+            catch (System.Exception ex)
+            {
+                if (ex.InnerException != null)
+                {
+                    if (ex.InnerException is VssUnauthorizedException)
+                    {
+                        errorMessage += "PAT token is invalid, or has not enogh permissions";
+                    }
+                    else
+                    {
+                        errorMessage += ex.InnerException.Message;
+                    }
+                }
+                else
+                {
+                    errorMessage += ex.Message;
+                }
+            }
+            if (!string.IsNullOrEmpty(errorMessage))
+            {
+                MessageBox.Show(errorMessage);
+                return false;
+            }
+            return true;
         }
 
         /// <summary>

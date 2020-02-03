@@ -14,10 +14,10 @@ namespace AzureDevopsPlugin.Forms
     public partial class AddCommentToWorkItem : Form
     {
         private readonly MailItem _mailItem;
-        private readonly string _customFieldName;
-        public AddCommentToWorkItem(MailItem mailItem, IList<Models.WorkItem> workItems, string customFieldName, int selectedRow)
+        private readonly Models.WorkItem _workItem;
+        public AddCommentToWorkItem(MailItem mailItem, Models.WorkItem workItem)
         {
-            if (workItems == null || workItems.Count == 0)
+            if (workItem == null)
             {
                 throw new ArgumentNullException("workItems property is empty");
             }
@@ -25,19 +25,12 @@ namespace AzureDevopsPlugin.Forms
             {
                 throw new ArgumentNullException("mailItem property is required");
             }
-            if (string.IsNullOrEmpty(customFieldName))
-            {
-                throw new ArgumentNullException("customFieldName property is required");
-            }
-            _customFieldName = customFieldName;
+            _workItem = workItem;
             _mailItem = mailItem;
             InitializeComponent();
             commentTextBox.BodyHtml = Utility.GetLastMessageFromMessageHTMLBody(mailItem);
-            foreach (var workItem in workItems)
-            {
-                workItemsRadioButtonList.Items.Add(workItem);
-            }
-            workItemsRadioButtonList.SelectedIndex = selectedRow;
+            workItemTextBox.Text = workItem.ToString();
+            workItemTextBox.Enabled = false;
         }
 
 
@@ -58,11 +51,6 @@ namespace AzureDevopsPlugin.Forms
         private bool ValidateCommentFields()
         {
             var errorMessage = "";
-            if (workItemsRadioButtonList.SelectedItem == null)
-            {
-                errorMessage += "field work item not selected\n";
-            }
-
             if (string.IsNullOrEmpty(commentTextBox.BodyHtml))
             {
                 errorMessage += "field comment is empty\n";
@@ -80,7 +68,6 @@ namespace AzureDevopsPlugin.Forms
         private void ChangeEnabledStateOfControls(bool enabled)
         {
             commentTextBox.Enabled = enabled;
-            workItemsRadioButtonList.Enabled = enabled;
             includeAttachmentsCheckBox.Enabled = enabled;
         }
 
@@ -91,10 +78,9 @@ namespace AzureDevopsPlugin.Forms
                 try
                 {
                     ChangeEnabledStateOfControls(false);
-                    var workItem = (Models.WorkItem)workItemsRadioButtonList.SelectedItem;
                     var comment = commentTextBox.BodyHtml;
                     var withAttachments = includeAttachmentsCheckBox.Checked;
-                    var commentEntity = Utility.AddCommentToWorkItem(workItem.Id, comment, _mailItem.Attachments, withAttachments);
+                    var commentEntity = Utility.AddCommentToWorkItem(_workItem.Id, comment, _mailItem.Attachments, withAttachments);
                     this.Close();
                 }
                 finally 
@@ -109,32 +95,6 @@ namespace AzureDevopsPlugin.Forms
         private void useOriginalMessageBodyBtn_Click(object sender, EventArgs e)
         {
             commentTextBox.BodyHtml = _mailItem.HTMLBody;
-        }
-
-        private void workItemsRadioButtonList_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void workItemsRadioButtonList_MouseDoubleClick(object sender, MouseEventArgs e)
-        {
-            if (Settings.settings.Validate())
-            {
-                if (workItemsRadioButtonList.SelectedItem != null)
-                {
-                    var selectedItem = (Models.WorkItem)workItemsRadioButtonList.SelectedItem;
-                    var link = $"https://dev.azure.com/{Settings.settings.OrgName}/{Settings.settings.ProjectName}/_workitems/edit/{selectedItem.Id}";
-                    try
-                    {
-                        System.Diagnostics.Process.Start(link);
-                    }
-                    catch (System.Exception ex)
-                    {
-                        MessageBox.Show("Unable to open link - " + link);
-                    }
-                }
-                
-            }
         }
     }
 }

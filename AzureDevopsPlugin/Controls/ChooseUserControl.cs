@@ -21,8 +21,11 @@ namespace AzureDevopsPlugin.Controls
         {
             InitializeComponent();
             workItemGridView.ColumnHeadersVisible = false;
+            workItemGridView.Columns.Add("Color", "Color");
             workItemGridView.Columns.Add("Id", "Id");
             workItemGridView.Columns.Add("Title", "Title");
+            workItemGridView.Columns[0].Width = 15;
+            workItemGridView.Columns[1].AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
         }
 
         public void FillTaskPane(List<Models.WorkItem> workItems, MailItem mailItem)
@@ -46,9 +49,12 @@ namespace AzureDevopsPlugin.Controls
             _mailItem = mailItem;
             _workItems = workItems;
             workItemGridView.Rows.Clear();
+            var i = 0;
             foreach (var workItem in workItems)
             {
-                workItemGridView.Rows.Add(workItem.Id, workItem.Title);
+                workItemGridView.Rows.Add("",workItem.Id, workItem.Title);
+                workItemGridView.Rows[i].Cells[0].Style.BackColor = workItem.StateColor;
+                i++;
             }
         }
 
@@ -60,7 +66,7 @@ namespace AzureDevopsPlugin.Controls
 
         private void addCommentBtn_Click(object sender, EventArgs e)
         {
-            var form = new AddCommentToWorkItem(_mailItem, _workItems, Settings.settings.CategoryCustomFieldName, workItemGridView.CurrentCell.RowIndex);
+            var form = new AddCommentToWorkItem(_mailItem, _workItems[workItemGridView.CurrentCell.RowIndex]);
             Utility.MoveFormToCenterAndShow(form);
         }
 

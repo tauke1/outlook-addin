@@ -36,7 +36,7 @@
     <PublishUrl>C:\Users\tauke\Documents\test\</PublishUrl>
     <InstallUrl />
     <TargetCulture>en</TargetCulture>
-    <ApplicationVersion>1.0.0.5</ApplicationVersion>
+    <ApplicationVersion>1.0.0.6</ApplicationVersion>
     <AutoIncrementApplicationRevision>true</AutoIncrementApplicationRevision>
     <UpdateEnabled>true</UpdateEnabled>
     <UpdateInterval>7</UpdateInterval>
@@ -371,9 +371,6 @@
     </Compile>
     <Compile Include="Forms\AddCommentToWorkItem.Designer.cs">
       <DependentUpon>AddCommentToWorkItem.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\RadioButtonList1.cs">
-      <SubType>Component</SubType>
     </Compile>
     <Compile Include="Models\WorkItem.cs" />
     <Compile Include="Forms\NewWorkItem.cs">

@@ -13,8 +13,6 @@ namespace AzureDevopsPlugin
     {
         private static Settings _settings;
 
-
-
         public static Settings settings
         {
             get
@@ -65,6 +63,8 @@ namespace AzureDevopsPlugin
             get { return (string)this["CategoryCustomFieldName"]; }
             set { this["CategoryCustomFieldName"] = value; }
         }
+
+        public IList<string> CategoryCustomFieldValues { get; set; }
 
         public bool Validate(bool showMessage = true)
         {

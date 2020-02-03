@@ -16,8 +16,7 @@ namespace AzureDevopsPlugin.Models
             { "Under Monitoring", Color.FromArgb(143,170,161) },
             { "On Hold", Color.FromArgb(238,237,86) },
             { "Resolved", Color.FromArgb(161,185,103) },
-            { "Closed", Color.FromArgb(84,140,79) },
-            { "To Do", Color.FromArgb(238,237,86) } // delete this after testing
+            { "Closed", Color.FromArgb(84,140,79) }
         };
 
         public int Id { get; set; }

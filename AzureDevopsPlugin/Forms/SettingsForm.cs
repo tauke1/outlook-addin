@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Microsoft.TeamFoundation.WorkItemTracking.Process.WebApi;
+using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
+using Microsoft.VisualStudio.Services.Common;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -24,23 +27,28 @@ namespace AzureDevopsPlugin.Forms
 
         private void saveButton_Click(object sender, EventArgs e)
         {
+            var orgName = orgNameTextBox.Text != null ? orgNameTextBox.Text.Trim() : null;
+            var projectName = projectNameTextBox.Text != null ? projectNameTextBox.Text.Trim() : null;
+            var patToken = patTokenTextBox.Text != null ? patTokenTextBox.Text.Trim() : null;
+            var customCategoryField = customCategoryFieldTextBox.Text != null ? customCategoryFieldTextBox.Text.Trim() : null;
+            var workItemType = workItemTypeTextBox.Text != null ? workItemTypeTextBox.Text.Trim() : null;
             var errorMessage = "";
-            if (string.IsNullOrEmpty(orgNameTextBox.Text))
+            if (string.IsNullOrEmpty(orgName))
             {
                 errorMessage += "organization name field is empty\n";
             }
 
-            if (string.IsNullOrEmpty(projectNameTextBox.Text))
+            if (string.IsNullOrEmpty(projectName))
             {
                 errorMessage += "project name field is empty\n";
             }
 
-            if (string.IsNullOrEmpty(patTokenTextBox.Text))
+            if (string.IsNullOrEmpty(patToken))
             {
                 errorMessage += "PAT token field is empty\n";
             }
 
-            if (string.IsNullOrEmpty(customCategoryFieldTextBox.Text))
+            if (string.IsNullOrEmpty(customCategoryField))
             {
                 errorMessage += "PAT token field is empty\n";
             }
@@ -49,6 +57,7 @@ namespace AzureDevopsPlugin.Forms
             {
                 errorMessage += "work Item type field is empty\n";
             }
+            
 
             if (!string.IsNullOrEmpty(errorMessage))
             {
@@ -56,20 +65,20 @@ namespace AzureDevopsPlugin.Forms
             }
             else
             {
-                Settings.settings.CategoryCustomFieldName = customCategoryFieldTextBox.Text.Trim();
-                Settings.settings.OrgName = orgNameTextBox.Text.Trim();
-                Settings.settings.ProjectName = projectNameTextBox.Text.Trim();
-                Settings.settings.PatToken = patTokenTextBox.Text.Trim();
-                Settings.settings.WorkItemType = workItemTypeTextBox.Text.Trim();
-                Settings.settings.Save();
-                this.Close();
-                for (int i = Application.OpenForms.Count - 1; i >= 0; i--)
+                var witClient = Utility.GetTFSHttpClient<WorkItemTrackingHttpClient>(orgName, patToken);
+                var witProcessClient = Utility.GetTFSHttpClient<WorkItemTrackingProcessHttpClient>(orgName, patToken);
+                if (Utility.ValidateVssSettings(workItemType, projectName, customCategoryField, witClient, witProcessClient))
                 {
-                    if (Application.OpenForms[i].Name != "Menu")
-                        Application.OpenForms[i].Close();
+                    Settings.settings.CategoryCustomFieldName = customCategoryField;
+                    Settings.settings.OrgName = orgName;
+                    Settings.settings.ProjectName = projectName;
+                    Settings.settings.PatToken = patToken;
+                    Settings.settings.WorkItemType = workItemType;
+                    Settings.settings.Save();
+                    this.Close();
                 }
             }
-
         }
+
     }
 }
