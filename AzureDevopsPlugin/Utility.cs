@@ -326,8 +326,6 @@ namespace AzureDevopsPlugin
             return false;
         }
 
-        public static string ProcessException(System.Exception ex) => ex.InnerException != null ? ex.InnerException is VssUnauthorizedException ? "PAT token is invalid, or has not enough permissions" : ex.InnerException.Message : ex.Message;
-
         public static bool ValidateVssSettings(string workItemType, string projectName, string customCategoryField, WorkItemTrackingHttpClient witClient, WorkItemTrackingProcessHttpClient witProcessClient)
         {
             if (string.IsNullOrEmpty(workItemType) || string.IsNullOrEmpty(projectName) || string.IsNullOrEmpty(customCategoryField) || witClient == null || witProcessClient == null)
@@ -353,6 +351,8 @@ namespace AzureDevopsPlugin
             }
             return true;
         }
+
+        public static string ProcessException(System.Exception ex) => ex.InnerException != null ? ex.InnerException is VssUnauthorizedException ? "PAT token is invalid, or has not enough permissions" : ex.InnerException.Message : ex.Message;
 
         /// <summary>
         /// Get last reply from message
