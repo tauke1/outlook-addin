@@ -82,7 +82,7 @@ namespace AzureDevopsPlugin.Controls
                 }
                 catch (System.Exception ex)
                 {
-                    MessageBox.Show("Unable to open link - " + link);
+                    MessageBox.Show("Unable to open link - " + link, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }

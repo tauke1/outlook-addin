@@ -98,7 +98,7 @@ namespace AzureDevopsPlugin
             {
                 if (showMessage)
                 { 
-                    MessageBox.Show(errorMessage);
+                    MessageBox.Show(errorMessage, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
                 return false;
             }

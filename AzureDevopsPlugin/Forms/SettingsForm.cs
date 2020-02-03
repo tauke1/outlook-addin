@@ -57,25 +57,32 @@ namespace AzureDevopsPlugin.Forms
             {
                 errorMessage += "work Item type field is empty\n";
             }
-            
+
 
             if (!string.IsNullOrEmpty(errorMessage))
             {
-                MessageBox.Show(errorMessage);
+                MessageBox.Show(errorMessage, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             else
             {
-                var witClient = Utility.GetTFSHttpClient<WorkItemTrackingHttpClient>(orgName, patToken);
-                var witProcessClient = Utility.GetTFSHttpClient<WorkItemTrackingProcessHttpClient>(orgName, patToken);
-                if (Utility.ValidateVssSettings(workItemType, projectName, customCategoryField, witClient, witProcessClient))
+                try
                 {
-                    Settings.settings.CategoryCustomFieldName = customCategoryField;
-                    Settings.settings.OrgName = orgName;
-                    Settings.settings.ProjectName = projectName;
-                    Settings.settings.PatToken = patToken;
-                    Settings.settings.WorkItemType = workItemType;
-                    Settings.settings.Save();
-                    this.Close();
+                    var witClient = Utility.GetTFSHttpClient<WorkItemTrackingHttpClient>(orgName, patToken);
+                    var witProcessClient = Utility.GetTFSHttpClient<WorkItemTrackingProcessHttpClient>(orgName, patToken);
+                    if (Utility.ValidateVssSettings(workItemType, projectName, customCategoryField, witClient, witProcessClient))
+                    {
+                        Settings.settings.CategoryCustomFieldName = customCategoryField;
+                        Settings.settings.OrgName = orgName;
+                        Settings.settings.ProjectName = projectName;
+                        Settings.settings.PatToken = patToken;
+                        Settings.settings.WorkItemType = workItemType;
+                        Settings.settings.Save();
+                        this.Close();
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    MessageBox.Show(Utility.ProcessException(ex), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }

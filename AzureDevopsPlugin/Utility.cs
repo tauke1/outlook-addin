@@ -29,7 +29,7 @@ namespace AzureDevopsPlugin
         /// Get TFS client
         /// </summary>
         /// <returns></returns>
-        public static T GetTFSHttpClient<T>() where T: VssHttpClientBase
+        public static T GetTFSHttpClient<T>() where T : VssHttpClientBase
         {
             var valid = Settings.settings.Validate();
             if (valid)
@@ -206,39 +206,24 @@ namespace AzureDevopsPlugin
                         "Order By [State] Asc, [Changed Date] Desc",
                 };
 
-                try
+                var result = await workitemClient.QueryByWiqlAsync(wiql);
+                if (result.WorkItems.Count() > 0)
                 {
-                    var result = await workitemClient.QueryByWiqlAsync(wiql);
-                    if (result.WorkItems.Count() > 0)
+                    var workItems = workitemClient.GetWorkItemsAsync(result.WorkItems.Select(a => a.Id), new List<string> { "System.State", "System.Title" }).Result;
+                    foreach (var workItem in workItems)
                     {
-                        var workItems = workitemClient.GetWorkItemsAsync(result.WorkItems.Select(a => a.Id), new List<string> { "System.State", "System.Title" }).Result;
-                        foreach (var workItem in workItems)
+                        if (!workItem.Id.HasValue)
                         {
-                            if (!workItem.Id.HasValue)
-                            {
-                                continue;
-                            }
-
-                            list.Add(new Models.WorkItem { Id = workItem.Id.Value, Title = (string)workItem.Fields["System.Title"], State = (string)workItem.Fields["System.State"], Url = workItem.Url });
+                            continue;
                         }
-                    }
 
-                    return list;
-                }
-                catch (System.Exception ex)
-                {
-                    if (ex.InnerException != null)
-                    {
-                        MessageBox.Show("Errors occured: message = " + ex.InnerException.Message);
+                        list.Add(new Models.WorkItem { Id = workItem.Id.Value, Title = (string)workItem.Fields["System.Title"], State = (string)workItem.Fields["System.State"], Url = workItem.Url });
                     }
-                    else
-                    {
-                        MessageBox.Show("Errors occured: message = " + ex.Message);
-                    }
-                    throw;
                 }
 
+                return list;
             }
+
             throw new System.Exception("bad settings file");
         }
 
@@ -324,15 +309,24 @@ namespace AzureDevopsPlugin
 
         public static bool ValidateVssSettings()
         {
-            if (!Settings.settings.Validate())
+            try
             {
-                return false;
+                if (!Settings.settings.Validate())
+                {
+                    return false;
+                }
+                var witClient = GetTFSHttpClient<WorkItemTrackingHttpClient>();
+                var witProcessClient = GetTFSHttpClient<WorkItemTrackingProcessHttpClient>();
+                return ValidateVssSettings(Settings.settings.WorkItemType, Settings.settings.ProjectName, Settings.settings.CategoryCustomFieldName, witClient, witProcessClient);
             }
-
-            var witClient = GetTFSHttpClient<WorkItemTrackingHttpClient>();
-            var witProcessClient = GetTFSHttpClient<WorkItemTrackingProcessHttpClient>();
-            return ValidateVssSettings(Settings.settings.WorkItemType, Settings.settings.ProjectName, Settings.settings.CategoryCustomFieldName, witClient, witProcessClient);
+            catch (System.Exception ex)
+            {
+                MessageBox.Show(ProcessException(ex), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            return false;
         }
+
+        public static string ProcessException(System.Exception ex) => ex.InnerException != null ? ex.InnerException is VssUnauthorizedException ? "PAT token is invalid, or has not enough permissions" : ex.InnerException.Message : ex.Message;
 
         public static bool ValidateVssSettings(string workItemType, string projectName, string customCategoryField, WorkItemTrackingHttpClient witClient, WorkItemTrackingProcessHttpClient witProcessClient)
         {
@@ -349,25 +343,12 @@ namespace AzureDevopsPlugin
             }
             catch (System.Exception ex)
             {
-                if (ex.InnerException != null)
-                {
-                    if (ex.InnerException is VssUnauthorizedException)
-                    {
-                        errorMessage += "PAT token is invalid, or has not enogh permissions";
-                    }
-                    else
-                    {
-                        errorMessage += ex.InnerException.Message;
-                    }
-                }
-                else
-                {
-                    errorMessage += ex.Message;
-                }
+                errorMessage += ProcessException(ex);
             }
+
             if (!string.IsNullOrEmpty(errorMessage))
             {
-                MessageBox.Show(errorMessage);
+                MessageBox.Show(errorMessage, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
             return true;

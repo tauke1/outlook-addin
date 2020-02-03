@@ -63,7 +63,7 @@ namespace AzureDevopsPlugin.Forms
 
             if (!string.IsNullOrEmpty(errorMessage))
             {
-                MessageBox.Show(errorMessage);
+                MessageBox.Show(errorMessage, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
 
@@ -91,6 +91,10 @@ namespace AzureDevopsPlugin.Forms
                     var createdWorkItem = Utility.CreateWorkItem(title, description, category, _outlookItem.Attachments, withAttachments);
                     MessageBox.Show("item was created, id = " + createdWorkItem.Id);
                     this.Close();
+                }
+                catch (System.Exception ex)
+                {
+                    MessageBox.Show(Utility.ProcessException(ex), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
                 finally
                 {

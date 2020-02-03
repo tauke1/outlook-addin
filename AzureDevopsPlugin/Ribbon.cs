@@ -90,14 +90,7 @@ namespace AzureDevopsPlugin
                         }
                         catch (System.Exception ex)
                         {
-                            if (ex.InnerException != null)
-                            {
-                                MessageBox.Show(ex.InnerException.Message);
-                            }
-                            else
-                            { 
-                                MessageBox.Show(ex.Message);
-                            }
+                            MessageBox.Show(Utility.ProcessException(ex), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         }
                         finally
                         {

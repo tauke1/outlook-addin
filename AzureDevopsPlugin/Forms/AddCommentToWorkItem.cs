@@ -33,21 +33,6 @@ namespace AzureDevopsPlugin.Forms
             workItemTextBox.Enabled = false;
         }
 
-
-        private void workItemsListComboBox_DrawItem(object sender, DrawItemEventArgs e)
-        {
-            // Draw the background 
-            e.DrawBackground();
-
-            // Get the item text
-            var item = (Models.WorkItem)(((ComboBox)sender).Items[e.Index]);
-            // Determine the forecolor based on whether or not the item is selected    
-            e.Graphics.DrawRectangle(new Pen(Color.White), e.Bounds);
-            e.Graphics.FillRectangle(new SolidBrush(item.StateColor), e.Bounds);
-            // Draw the text    
-            e.Graphics.DrawString(item.ToString(), ((Control)sender).Font, Brushes.Black, e.Bounds.X, e.Bounds.Y);
-        }
-
         private bool ValidateCommentFields()
         {
             var errorMessage = "";
@@ -58,7 +43,7 @@ namespace AzureDevopsPlugin.Forms
 
             if (!string.IsNullOrEmpty(errorMessage))
             {
-                MessageBox.Show(errorMessage);
+                MessageBox.Show(errorMessage, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
 
@@ -82,6 +67,10 @@ namespace AzureDevopsPlugin.Forms
                     var withAttachments = includeAttachmentsCheckBox.Checked;
                     var commentEntity = Utility.AddCommentToWorkItem(_workItem.Id, comment, _mailItem.Attachments, withAttachments);
                     this.Close();
+                }
+                catch (System.Exception ex)
+                {
+                    MessageBox.Show(Utility.ProcessException(ex),"Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
                 finally 
                 {
