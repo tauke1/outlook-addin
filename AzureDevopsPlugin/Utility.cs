@@ -1,5 +1,6 @@
 ﻿using HtmlAgilityPack;
 using Microsoft.Office.Interop.Outlook;
+using Microsoft.TeamFoundation.WorkItemTracking.Process.WebApi;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
 using Microsoft.VisualStudio.Services.Common;
@@ -28,7 +29,7 @@ namespace AzureDevopsPlugin
         /// Get TFS client
         /// </summary>
         /// <returns></returns>
-        private static WorkItemTrackingHttpClient GetWorkItemTrackingHttpClient()
+        private static T GetTFSHttpClient<T>() where T: VssHttpClientBase
         {
             var valid = Settings.settings.Validate();
             if (valid)
@@ -36,8 +37,7 @@ namespace AzureDevopsPlugin
                 var u = new Uri($"https://dev.azure.com/" + Settings.settings.OrgName);
                 VssCredentials c = new VssCredentials(new VssBasicCredential(string.Empty, Settings.settings.PatToken));
                 var connection = new VssConnection(u, c);
-
-                return connection.GetClient<WorkItemTrackingHttpClient>();
+                return connection.GetClient<T>();
             }
 
             return null;
@@ -50,7 +50,7 @@ namespace AzureDevopsPlugin
         /// <returns></returns>
         public static AttachmentReference CreateAttachment(string filePath)
         {
-            var workitemClient = GetWorkItemTrackingHttpClient();
+            var workitemClient = GetTFSHttpClient<WorkItemTrackingHttpClient>();
             if (workitemClient != null)
             {
                 using (FileStream attStream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
@@ -75,7 +75,7 @@ namespace AzureDevopsPlugin
         /// <returns></returns>
         public static WorkItem CreateWorkItem(string title, string description, string category, Attachments attachments = null, bool withAttachments = false)
         {
-            var workitemClient = GetWorkItemTrackingHttpClient();
+            var workitemClient = GetTFSHttpClient<WorkItemTrackingHttpClient>();
             if (workitemClient != null)
             {
                 var document = new JsonPatchDocument();
@@ -117,7 +117,7 @@ namespace AzureDevopsPlugin
                 document.Add(
                 new JsonPatchOperation()
                 {
-                    Path = "/fields/System.Tags",
+                    Path = "/fields/Custom." + Settings.settings.CategoryCustomFieldName,
                     Operation = Operation.Add,
                     Value = category
                 });
@@ -152,7 +152,7 @@ namespace AzureDevopsPlugin
         /// <returns></returns>
         public static Comment AddCommentToWorkItem(int workItemId, string comment, Attachments attachments = null, bool withAttachments = false)
         {
-            var workItemsClient = GetWorkItemTrackingHttpClient();
+            var workItemsClient = GetTFSHttpClient<WorkItemTrackingHttpClient>();
             if (workItemsClient != null)
             {
                 var workItem = workItemsClient.GetWorkItemAsync(workItemId).Result;
@@ -185,7 +185,7 @@ namespace AzureDevopsPlugin
         /// <returns></returns>
         public static async Task<List<Models.WorkItem>> FindWorkItemsByTitle(string title)
         {
-            var workitemClient = GetWorkItemTrackingHttpClient();
+            var workitemClient = GetTFSHttpClient<WorkItemTrackingHttpClient>();
             if (workitemClient != null)
             {
                 var list = new List<Models.WorkItem>();
@@ -223,12 +223,94 @@ namespace AzureDevopsPlugin
                 }
                 catch (System.Exception ex)
                 {
-                    MessageBox.Show("Errors occured: message = " + ex.Message);
+                    if (ex.InnerException != null)
+                    {
+                        MessageBox.Show("Errors occured: message = " + ex.InnerException.Message);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Errors occured: message = " + ex.Message);
+                    }
                     throw;
                 }
 
             }
             throw new System.Exception("bad settings file");
+        }
+
+        //public static (IList<string> ,string) CheckCategoryExistsAndGetCustomFieldPickList(string customField, string workItemType)
+        //{
+        //    var witClient = GetTFSHttpClient<WorkItemTrackingHttpClient>();
+        //    var witTrackingClient = GetTFSHttpClient<WorkItemTrackingProcessHttpClient>();
+        //    string errors = "";
+        //    var patIsValid = true;
+        //    try
+        //    {
+        //        witClient.GetWorkItemTypeAsync(Settings.settings.ProjectName, workItemType).Wait();
+        //    }
+        //    catch (System.Exception ex)
+        //    {
+        //        if (ex.InnerException != null)
+        //        {
+        //            errors += "\n" + ex.InnerException.Message;
+        //            if (ex.InnerException is VssUnauthorizedException)
+        //            {
+        //                return (null, errors);
+        //            }
+        //        }
+        //        else
+        //        {
+        //            errors += "\n" + ex.Message;
+        //        }
+        //    }
+
+        //    IList<string> pickListValues;
+        //    if (patIsValid)
+        //    {
+        //        var refName = "Custom." + customField;
+        //        try
+        //        {
+        //            pickListValues = GetCustomFieldPickListValue(refName);
+        //        }
+        //        catch (System.Exception ex)
+        //        {
+        //            if (ex.InnerException != null)
+        //            {
+        //                errors += "\n" + ex.InnerException.Message;
+        //                if (ex.InnerException is VssUnauthorizedException)
+        //                {
+        //                    return (null, errors); ;
+        //                }
+        //            }
+        //            else
+        //            {
+        //                errors += "\n" + ex.Message;
+        //            }
+        //        }
+        //    }
+
+        //    return (null, errors); ;
+        //}
+
+        public static IList<string> GetCustomFieldPickListValue(string fieldName)
+        {
+            var witClient = GetTFSHttpClient<WorkItemTrackingHttpClient>();
+            var witTrackingClient = GetTFSHttpClient<WorkItemTrackingProcessHttpClient>();
+            if (witClient == null && witTrackingClient == null)
+            {
+                throw new System.Exception("bad configs file");
+            }
+
+            var field =  witClient.GetFieldAsync("Custom." + fieldName).Result;
+            if (field.IsPicklist)
+            {
+                var pickList = witTrackingClient.GetListAsync(field.PicklistId.Value).Result;
+                return pickList.Items;
+            }
+            else
+            {
+                throw new System.Exception(fieldName + " field is not picklist");
+            }
         }
 
         /// <summary>

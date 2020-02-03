@@ -34,9 +34,10 @@ namespace AzureDevopsPlugin.Forms
             _outlookItem = outlookItem;
             InitializeComponent();
             ResetFields();
-            foreach (var cat in Settings.settings.Categories)
+            var pickListValues = Utility.GetCustomFieldPickListValue(Settings.settings.CategoryCustomFieldName);
+            foreach (var value in pickListValues)
             {
-                categoriesComboBox.Items.Add(cat);
+                categoriesComboBox.Items.Add(value);
             }
 
             categoriesComboBox.SelectedIndex = 0;

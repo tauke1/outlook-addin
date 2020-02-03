@@ -18,7 +18,7 @@ namespace AzureDevopsPlugin.Forms
             orgNameTextBox.Text = Settings.settings.OrgName;
             projectNameTextBox.Text = Settings.settings.ProjectName;
             patTokenTextBox.Text = Settings.settings.PatToken;
-            categoriesTextBox.Text = string.Join(",", Settings.settings.Categories.ToArray());
+            customCategoryFieldTextBox.Text = Settings.settings.CategoryCustomFieldName;
             workItemTypeTextBox.Text = Settings.settings.WorkItemType;
         }
 
@@ -40,7 +40,7 @@ namespace AzureDevopsPlugin.Forms
                 errorMessage += "PAT token field is empty\n";
             }
 
-            if (string.IsNullOrEmpty(categoriesTextBox.Text))
+            if (string.IsNullOrEmpty(customCategoryFieldTextBox.Text))
             {
                 errorMessage += "PAT token field is empty\n";
             }
@@ -56,14 +56,18 @@ namespace AzureDevopsPlugin.Forms
             }
             else
             {
-                var list = categoriesTextBox.Text.Split(',').Select(a => a.Trim()).ToList();
-                Settings.settings.Categories = list;
+                Settings.settings.CategoryCustomFieldName = customCategoryFieldTextBox.Text.Trim();
                 Settings.settings.OrgName = orgNameTextBox.Text.Trim();
                 Settings.settings.ProjectName = projectNameTextBox.Text.Trim();
                 Settings.settings.PatToken = patTokenTextBox.Text.Trim();
                 Settings.settings.WorkItemType = workItemTypeTextBox.Text.Trim();
                 Settings.settings.Save();
                 this.Close();
+                for (int i = Application.OpenForms.Count - 1; i >= 0; i--)
+                {
+                    if (Application.OpenForms[i].Name != "Menu")
+                        Application.OpenForms[i].Close();
+                }
             }
 
         }

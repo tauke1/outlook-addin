@@ -14,7 +14,8 @@ namespace AzureDevopsPlugin.Forms
     public partial class AddCommentToWorkItem : Form
     {
         private readonly MailItem _mailItem;
-        public AddCommentToWorkItem(MailItem mailItem, List<Models.WorkItem> workItems, int selectedRow)
+        private readonly string _customFieldName;
+        public AddCommentToWorkItem(MailItem mailItem, IList<Models.WorkItem> workItems, string customFieldName, int selectedRow)
         {
             if (workItems == null || workItems.Count == 0)
             {
@@ -24,6 +25,11 @@ namespace AzureDevopsPlugin.Forms
             {
                 throw new ArgumentNullException("mailItem property is required");
             }
+            if (string.IsNullOrEmpty(customFieldName))
+            {
+                throw new ArgumentNullException("customFieldName property is required");
+            }
+            _customFieldName = customFieldName;
             _mailItem = mailItem;
             InitializeComponent();
             commentTextBox.BodyHtml = Utility.GetLastMessageFromMessageHTMLBody(mailItem);

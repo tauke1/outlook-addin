@@ -40,6 +40,7 @@ namespace AzureDevopsPlugin
         private Office.IRibbonUI ribbon;
         private bool _createWorkItemButtonEnabled = true;
         private readonly WindowsFormsSynchronizationContext synchronizationContext;
+        private IList<string> _pickListValues = new List<string>();
 
         public Ribbon()
         {
@@ -84,8 +85,17 @@ namespace AzureDevopsPlugin
                     {
                         try
                         {
+                            //(IList<string> pickListValues, string errors) = Utility.CheckCategoryExistsAndGetCustomFieldPickList(Settings.settings.CategoryCustomFieldName, Settings.settings.WorkItemType);
+                            //if (!string.IsNullOrEmpty(errors))
+                            //{
+                            //    MessageBox.Show(errors);
+                            //}
+                            //else
+                            //{
+                            // pickListValues = _pickListValues;
                             var workItems = Utility.FindWorkItemsByTitle(Utility.RemoveSubjectAbbreviationsFromSubject(mailItem.Subject)).Result;
                             synchronizationContext.Post(new SendOrPostCallback(o => Globals.ThisAddIn.FillTaskPane(workItems, mailItem)), null);
+                            //}
                             //synchronizationContext.Send(new SendOrPostCallback(o => CreateNewWorkItemsFormOrChooseForm(workItems, mailItem)), null);
                         }
                         finally

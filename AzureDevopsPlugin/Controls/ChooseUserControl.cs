@@ -60,7 +60,7 @@ namespace AzureDevopsPlugin.Controls
 
         private void addCommentBtn_Click(object sender, EventArgs e)
         {
-            var form = new AddCommentToWorkItem(_mailItem, _workItems, workItemGridView.CurrentCell.RowIndex);
+            var form = new AddCommentToWorkItem(_mailItem, _workItems, Settings.settings.CategoryCustomFieldName, workItemGridView.CurrentCell.RowIndex);
             Utility.MoveFormToCenterAndShow(form);
         }
 

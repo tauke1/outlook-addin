@@ -13,20 +13,7 @@ namespace AzureDevopsPlugin
     {
         private static Settings _settings;
 
-        public static List<string> CategoriesList = new List<string>{
-            "Check-ins verification",
-            "Code review",
-            "Communication",
-            "Developer support",
-            "Development",
-            "Infrastructure maintenance",
-            "Integrations",
-            "Investigation",
-            "Monitoring",
-            "Operational work (default)",
-            "Reporting",
-            "Testing"
-        };
+
 
         public static Settings settings
         {
@@ -73,10 +60,10 @@ namespace AzureDevopsPlugin
         }
 
         [UserScopedSetting()]
-        public List<string> Categories
+        public string CategoryCustomFieldName
         {
-            get { return (List<string>)this["Categories"]; }
-            set { this["Categories"] = value; }
+            get { return (string)this["CategoryCustomFieldName"]; }
+            set { this["CategoryCustomFieldName"] = value; }
         }
 
         public bool Validate(bool showMessage = true)
@@ -102,9 +89,9 @@ namespace AzureDevopsPlugin
                 errorMessage += "please fill organization name field in settings\n";
             }
 
-            if (this.Categories.Count == 0)
+            if (string.IsNullOrEmpty(this.CategoryCustomFieldName))
             {
-                errorMessage += "please fill categories field in settings\n";
+                errorMessage += "please fill category custom field in settings\n";
             }
 
             if (!string.IsNullOrEmpty(errorMessage))
@@ -117,17 +104,6 @@ namespace AzureDevopsPlugin
             }
 
             return true;
-        }
-
-        public void Init()
-        {
-            if (Categories == null || Categories.Count == 0)
-            {
-                Categories = new List<string>();
-                CategoriesList.ForEach(cat => Categories.Add(cat));
-                Save();
-                Reload();
-            }
         }
     }
 }
