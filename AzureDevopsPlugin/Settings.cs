@@ -66,6 +66,8 @@ namespace AzureDevopsPlugin
 
         public IList<string> CategoryCustomFieldValues { get; set; }
 
+        public string ProjectURL { get { return "https://github.com/tauke1/outlook-addin"; } }
+
         public bool Validate(bool showMessage = true)
         {
             var errorMessage = "";

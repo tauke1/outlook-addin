@@ -60,6 +60,18 @@ namespace AzureDevopsPlugin
             Settings.settings.Reload();
         }
 
+        public void OpenDocumentation(Office.IRibbonControl control)
+        {
+            try
+            {
+                System.Diagnostics.Process.Start(Settings.settings.ProjectURL);
+            }
+            catch(System.Exception ex)
+            {
+                Utility.ProcessException(ex);
+            }
+        }
+
         public bool CreateWorkItemButton_GetEnabled(Office.IRibbonControl rControl)
         {
             return _createWorkItemButtonEnabled;

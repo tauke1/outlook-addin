@@ -6,6 +6,7 @@
                 <group id="group1" label="Azure Devops">
                     <button id="CreateWorkItem" imageMso="OutlineExpand" label="Azure Devops" onAction="CreateWorkItem" getEnabled="CreateWorkItemButton_GetEnabled" />
                     <button id="Settings" imageMso="EditDocument" label="Settings" onAction="EditSettings" />
+                    <button id="About" imageMso="About" label="Documentation" onAction="OpenDocumentation" />
                 </group>
             </tab>
         </tabs>
