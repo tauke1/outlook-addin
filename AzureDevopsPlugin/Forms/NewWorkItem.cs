@@ -34,13 +34,16 @@ namespace AzureDevopsPlugin.Forms
             _outlookItem = outlookItem;
             InitializeComponent();
             ResetFields();
-            var pickListValues = Utility.GetCustomFieldPickListValue(Settings.settings.CategoryCustomFieldName);
-            foreach (var value in pickListValues)
+            if (Settings.settings.CategoryCustomFieldValues?.Count > 0)
             {
-                categoriesComboBox.Items.Add(value);
+                foreach (var value in Settings.settings.CategoryCustomFieldValues)
+                {
+                    categoriesComboBox.Items.Add(value);
+                }
+                categoriesComboBox.SelectedIndex = 0;
             }
 
-            categoriesComboBox.SelectedIndex = 0;
+
             Settings.settings.SetSettingsChangedNotification(() =>
             {
                 categoriesComboBox.Items.Clear();

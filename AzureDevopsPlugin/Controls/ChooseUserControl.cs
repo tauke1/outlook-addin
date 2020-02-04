@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Microsoft.Office.Interop.Outlook;
 using AzureDevopsPlugin.Forms;
+using System.Drawing.Drawing2D;
 
 namespace AzureDevopsPlugin.Controls
 {
@@ -24,7 +25,7 @@ namespace AzureDevopsPlugin.Controls
             workItemGridView.Columns.Add("Color", "Color");
             workItemGridView.Columns.Add("Id", "Id");
             workItemGridView.Columns.Add("Title", "Title");
-            workItemGridView.Columns[0].Width = 15;
+            workItemGridView.Columns[0].Width = 30;
             workItemGridView.Columns[1].AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
         }
 
