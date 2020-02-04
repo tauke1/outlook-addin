@@ -51,14 +51,19 @@ namespace AzureDevopsPlugin.Controls
             _workItems = workItems;
             workItemGridView.Rows.Clear();
             var i = 0;
-            foreach (var workItem in workItems)
-            {
-                workItemGridView.Rows.Add("",workItem.Id, workItem.Title);
-                workItemGridView.Rows[i].Cells[0].Style.BackColor = workItem.StateColor;
-                i++;
-            }
 
-            workItemGridView.CurrentCell = workItemGridView.Rows[0].Cells[2];
+            if (workItems?.Count > 0)
+            {
+                foreach (var workItem in workItems)
+                {
+                    workItemGridView.Rows.Add("", workItem.Id, workItem.Title);
+                    workItemGridView.Rows[i].Cells[0].Style.BackColor = workItem.StateColor;
+                    i++;
+                }
+
+                workItemGridView.CurrentCell = workItemGridView.Rows[0].Cells[2];
+
+            }
         }
 
         private void newWorkItemBtn_Click(object sender, EventArgs e)
