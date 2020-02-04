@@ -12,7 +12,7 @@ namespace AzureDevopsPlugin.Models
         static Dictionary<string, Color> StatesWithColors = new Dictionary<string, System.Drawing.Color>
         {
             { "new", Color.FromArgb(173,172,174) },
-            { "in irogress", Color.FromArgb(40,102,148) },
+            { "in progress", Color.FromArgb(40,102,148) },
             { "under monitoring", Color.FromArgb(143,170,161) },
             { "on hold", Color.FromArgb(238,237,86) },
             { "resolved", Color.FromArgb(161,185,103) },
