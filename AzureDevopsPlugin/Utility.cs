@@ -386,12 +386,12 @@ namespace AzureDevopsPlugin
             //    return htmlSplittedByOriginalMessageLabel[0].Trim();
             //}
 
-            /// finding last reply for messages sent from email
-            var divsByLtrDir = htmlSnippet.DocumentNode.SelectNodes("//div[@dir = 'ltr']");
-            if (divsByLtrDir?.Count > 0)
-            {
-                return divsByLtrDir[0].OuterHtml.Trim();
-            }
+            ///// finding last reply for messages sent from email
+            //var divsByLtrDir = htmlSnippet.DocumentNode.SelectNodes("//div[@dir = 'ltr']");
+            //if (divsByLtrDir?.Count > 0)
+            //{
+            //    return divsByLtrDir[0].OuterHtml.Trim();
+            //}
             return mailItem.HTMLBody;
         }
 

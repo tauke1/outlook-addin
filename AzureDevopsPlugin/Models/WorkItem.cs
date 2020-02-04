@@ -11,12 +11,12 @@ namespace AzureDevopsPlugin.Models
     {
         static Dictionary<string, Color> StatesWithColors = new Dictionary<string, System.Drawing.Color>
         {
-            { "New", Color.FromArgb(173,172,174) },
-            { "In Progress", Color.FromArgb(40,102,148) },
-            { "Under Monitoring", Color.FromArgb(143,170,161) },
-            { "On Hold", Color.FromArgb(238,237,86) },
-            { "Resolved", Color.FromArgb(161,185,103) },
-            { "Closed", Color.FromArgb(84,140,79) }
+            { "iew", Color.FromArgb(173,172,174) },
+            { "in irogress", Color.FromArgb(40,102,148) },
+            { "under monitoring", Color.FromArgb(143,170,161) },
+            { "on hold", Color.FromArgb(238,237,86) },
+            { "resolved", Color.FromArgb(161,185,103) },
+            { "closed", Color.FromArgb(84,140,79) }
         };
 
         public int Id { get; set; }
@@ -27,7 +27,8 @@ namespace AzureDevopsPlugin.Models
 
         public string Url { get; set; }
         public Color StateColor { get {
-                return StatesWithColors.ContainsKey(State) ? StatesWithColors[State] : Color.White;
+                var stateLower = State != null ? State.ToLower() : string.Empty;
+                return StatesWithColors.ContainsKey(stateLower) ? StatesWithColors[stateLower] : Color.White;
             }
         }
         public override string ToString()
