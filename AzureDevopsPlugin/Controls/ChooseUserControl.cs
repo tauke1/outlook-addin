@@ -94,5 +94,10 @@ namespace AzureDevopsPlugin.Controls
                 }
             }
         }
+
+        private void ChooseUserControl_Resize(object sender, EventArgs e)
+        {
+            workItemGridView.Width = this.Width - 50;
+        }
     }
 }

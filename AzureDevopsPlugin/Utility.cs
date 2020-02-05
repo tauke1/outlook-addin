@@ -299,6 +299,11 @@ namespace AzureDevopsPlugin
             if (field.IsPicklist)
             {
                 var pickList = witTrackingClient.GetListAsync(field.PicklistId.Value).Result;
+                if (pickList?.Items?.Count == 0)
+                {
+                    throw new System.Exception(fieldName + " field zero elements in picklist");
+                }
+
                 return pickList.Items;
             }
             else
@@ -335,9 +340,9 @@ namespace AzureDevopsPlugin
             var errorMessage = "";
             try
             {
-                witClient.GetWorkItemTypeAsync(projectName, workItemType).Wait();
                 var customFieldValues = Utility.GetCustomFieldPickListValue(customCategoryField, witClient, witProcessClient);
                 Settings.settings.CategoryCustomFieldValues = customFieldValues;
+                witClient.GetWorkItemTypeAsync(projectName, workItemType).Wait();
             }
             catch (System.Exception ex)
             {
@@ -359,11 +364,24 @@ namespace AzureDevopsPlugin
         /// </summary>
         /// <param name="mailItem"></param>
         /// <returns></returns>
-        public static string GetLastMessageFromMessageHTMLBody(MailItem mailItem)
+        public static string GetLastMessageFromMessageHTMLBody(MailItem mailItem, bool removeFormatting = false)
         {
             HtmlAgilityPack.HtmlDocument htmlSnippet = new HtmlAgilityPack.HtmlDocument();
             htmlSnippet.LoadHtml(mailItem.HTMLBody);
-            var divsByWordSection1Class = htmlSnippet.DocumentNode.SelectNodes("//div[@class = 'WordSection1']");
+            var htmlElement = htmlSnippet.DocumentNode;
+            if (removeFormatting)
+            {
+                if (htmlElement.SelectSingleNode("//body") != null)
+                {
+                    htmlElement = htmlSnippet.DocumentNode.SelectSingleNode("//body");
+                    htmlElement.Descendants()
+                        .Where(n => n.Name == "script" || n.Name == "style")
+                        .ToList()
+                        .ForEach(n => n.Remove());
+                }
+
+            }
+            var divsByWordSection1Class = htmlElement.SelectNodes("//div[@class = 'WordSection1']");
             // Finding messages created by outlook
             if (divsByWordSection1Class?.Count > 0)
             {
@@ -392,7 +410,7 @@ namespace AzureDevopsPlugin
             //{
             //    return divsByLtrDir[0].OuterHtml.Trim();
             //}
-            return mailItem.HTMLBody;
+            return htmlElement.OuterHtml;
         }
 
         public static string RemoveSubjectAbbreviationsFromSubject(string subject)

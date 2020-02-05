@@ -23,9 +23,36 @@ namespace AzureDevopsPlugin.Forms
             patTokenTextBox.Text = Settings.settings.PatToken;
             customCategoryFieldTextBox.Text = Settings.settings.CategoryCustomFieldName;
             workItemTypeTextBox.Text = Settings.settings.WorkItemType;
+            if (Validate(false))
+            {
+                FillCategoriesComboBox();
+            }
         }
 
-        private void saveButton_Click(object sender, EventArgs e)
+        private void FillCategoriesComboBox()
+        {
+            defaultCategoryComboBox.Items.Clear();
+            if (Settings.settings.CategoryCustomFieldValues?.Count > 0)
+            {
+                var categoryCustomFieldDefaultValueFoundIndex = 0;
+                var i = 0;
+                foreach (var cat in Settings.settings.CategoryCustomFieldValues)
+                {
+                    defaultCategoryComboBox.Items.Add(cat);
+                    if (cat == Settings.settings.CategoryCustomFieldDefaultValue)
+                    {
+                        categoryCustomFieldDefaultValueFoundIndex = i;
+                    }
+                    i++;
+                }
+
+                defaultCategoryComboBox.SelectedIndex = categoryCustomFieldDefaultValueFoundIndex;
+
+                defaultCategoryComboBox.Enabled = true;
+            }
+        }
+
+        private bool Validate(bool showMessage = true)
         {
             var orgName = orgNameTextBox.Text != null ? orgNameTextBox.Text.Trim() : null;
             var projectName = projectNameTextBox.Text != null ? projectNameTextBox.Text.Trim() : null;
@@ -59,7 +86,7 @@ namespace AzureDevopsPlugin.Forms
             }
 
 
-            if (!string.IsNullOrEmpty(errorMessage))
+            if (showMessage && !string.IsNullOrEmpty(errorMessage))
             {
                 MessageBox.Show(errorMessage, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
@@ -69,24 +96,60 @@ namespace AzureDevopsPlugin.Forms
                 {
                     var witClient = Utility.GetTFSHttpClient<WorkItemTrackingHttpClient>(orgName, patToken);
                     var witProcessClient = Utility.GetTFSHttpClient<WorkItemTrackingProcessHttpClient>(orgName, patToken);
-                    if (Utility.ValidateVssSettings(workItemType, projectName, customCategoryField, witClient, witProcessClient))
-                    {
-                        Settings.settings.CategoryCustomFieldName = customCategoryField;
-                        Settings.settings.OrgName = orgName;
-                        Settings.settings.ProjectName = projectName;
-                        Settings.settings.PatToken = patToken;
-                        Settings.settings.WorkItemType = workItemType;
-                        Settings.settings.Save();
-                        Settings.settings.SendSettingsChangedNotification();
-                        this.Close();
-                    }
+                    return Utility.ValidateVssSettings(workItemType, projectName, customCategoryField, witClient, witProcessClient);
                 }
                 catch (System.Exception ex)
                 {
-                    MessageBox.Show(Utility.ProcessException(ex), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    if (showMessage)
+                    {
+                        MessageBox.Show(Utility.ProcessException(ex), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
                 }
+            }
+
+            return false;
+        }
+
+        private void saveButton_Click(object sender, EventArgs e)
+        {
+            var orgName = orgNameTextBox.Text != null ? orgNameTextBox.Text.Trim() : null;
+            var projectName = projectNameTextBox.Text != null ? projectNameTextBox.Text.Trim() : null;
+            var patToken = patTokenTextBox.Text != null ? patTokenTextBox.Text.Trim() : null;
+            var customCategoryField = customCategoryFieldTextBox.Text != null ? customCategoryFieldTextBox.Text.Trim() : null;
+            var workItemType = workItemTypeTextBox.Text != null ? workItemTypeTextBox.Text.Trim() : null;
+
+            if (Validate())
+            {
+                string customDefaultCategory = null;
+                if (defaultCategoryComboBox.SelectedItem != null)
+                {
+                    foreach (var cat in Settings.settings.CategoryCustomFieldValues)
+                    {
+                        if (cat == (string)defaultCategoryComboBox.SelectedItem)
+                        {
+                            customDefaultCategory = cat;
+                        }
+                    }
+                }
+
+                Settings.settings.CategoryCustomFieldName = customCategoryField;
+                Settings.settings.OrgName = orgName;
+                Settings.settings.ProjectName = projectName;
+                Settings.settings.PatToken = patToken;
+                Settings.settings.WorkItemType = workItemType;
+                Settings.settings.CategoryCustomFieldDefaultValue = customDefaultCategory;
+                Settings.settings.Save();
+                Settings.settings.SendSettingsChangedNotification();
+                this.Close();
             }
         }
 
+        private void reloadCustomFields_Click(object sender, EventArgs e)
+        {
+            if (Validate())
+            {
+                FillCategoriesComboBox();
+            }
+        }
     }
 }

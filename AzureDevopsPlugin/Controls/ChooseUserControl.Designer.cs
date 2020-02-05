@@ -94,11 +94,11 @@
             // 
             this.label1.AutoSize = true;
             this.label1.BackColor = System.Drawing.Color.Gainsboro;
-            this.label1.Location = new System.Drawing.Point(34, 870);
+            this.label1.Location = new System.Drawing.Point(103, 874);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(707, 32);
+            this.label1.Size = new System.Drawing.Size(518, 32);
             this.label1.TabIndex = 4;
-            this.label1.Text = "double click on row to open work item in azure devops_";
+            this.label1.Text = "Double click on a row to open Work Item";
             // 
             // ChooseUserControl
             // 
@@ -114,6 +114,7 @@
             this.Margin = new System.Windows.Forms.Padding(8, 7, 8, 7);
             this.Name = "ChooseUserControl";
             this.Size = new System.Drawing.Size(749, 1006);
+            this.Resize += new System.EventHandler(this.ChooseUserControl_Resize);
             ((System.ComponentModel.ISupportInitialize)(this.workItemGridView)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();

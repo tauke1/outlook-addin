@@ -36,11 +36,19 @@ namespace AzureDevopsPlugin.Forms
             ResetFields();
             if (Settings.settings.CategoryCustomFieldValues?.Count > 0)
             {
+                var selectedIndex = 0;
+                var i = 0;
                 foreach (var value in Settings.settings.CategoryCustomFieldValues)
                 {
+                    if (value == Settings.settings.CategoryCustomFieldDefaultValue)
+                    {
+                        selectedIndex = i; 
+                    }
                     categoriesComboBox.Items.Add(value);
+                    i++;
                 }
-                categoriesComboBox.SelectedIndex = 0;
+
+                categoriesComboBox.SelectedIndex = selectedIndex;
             }
 
 
@@ -104,7 +112,9 @@ namespace AzureDevopsPlugin.Forms
                     var description = descriptionTextBox.BodyHtml;
                     var withAttachments = includeAttachmentsCheckBox.Checked;
                     var createdWorkItem = Utility.CreateWorkItem(title, description, category, _outlookItem.Attachments, withAttachments);
-                    MessageBox.Show("item was created, id = " + createdWorkItem.Id);
+                    var workItemCreatedForm = new WorkItemCreated(createdWorkItem.Id.Value);
+                    workItemCreatedForm.StartPosition = FormStartPosition.CenterParent;
+                    workItemCreatedForm.ShowDialog();
                     this.Close();
                 }
                 catch (System.Exception ex)

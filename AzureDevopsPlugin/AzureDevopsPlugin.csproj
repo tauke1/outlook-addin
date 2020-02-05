@@ -372,6 +372,12 @@
     <Compile Include="Forms\AddCommentToWorkItem.Designer.cs">
       <DependentUpon>AddCommentToWorkItem.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\WorkItemCreated.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\WorkItemCreated.Designer.cs">
+      <DependentUpon>WorkItemCreated.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\WorkItem.cs" />
     <Compile Include="Forms\NewWorkItem.cs">
       <SubType>Form</SubType>
@@ -458,6 +464,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\NewWorkItem.resx">
       <DependentUpon>NewWorkItem.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\WorkItemCreated.resx">
+      <DependentUpon>WorkItemCreated.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Editor.resx">
       <Generator>ResXFileCodeGenerator</Generator>
