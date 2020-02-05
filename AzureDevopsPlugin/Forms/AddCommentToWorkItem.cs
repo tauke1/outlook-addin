@@ -85,5 +85,10 @@ namespace AzureDevopsPlugin.Forms
         {
             commentTextBox.BodyHtml = _mailItem.HTMLBody;
         }
+
+        private void removeStylesButton_Click(object sender, EventArgs e)
+        {
+            commentTextBox.BodyHtml = Utility.GetLastMessageFromMessageHTMLBody(_mailItem, true);
+        }
     }
 }

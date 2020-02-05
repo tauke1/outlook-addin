@@ -151,5 +151,10 @@ namespace AzureDevopsPlugin.Forms
         {
             descriptionTextBox.BodyHtml = _outlookItem.HTMLBody;
         }
+
+        private void removeStylesButton_Click(object sender, EventArgs e)
+        {
+            descriptionTextBox.BodyHtml = Utility.GetLastMessageFromMessageHTMLBody(_outlookItem, true);
+        }
     }
 }

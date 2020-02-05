@@ -368,19 +368,20 @@ namespace AzureDevopsPlugin
         {
             HtmlAgilityPack.HtmlDocument htmlSnippet = new HtmlAgilityPack.HtmlDocument();
             htmlSnippet.LoadHtml(mailItem.HTMLBody);
+
+            if (removeFormatting)
+            {
+                RemoveStyleAttributes(htmlSnippet);
+            }
             var htmlElement = htmlSnippet.DocumentNode;
             if (removeFormatting)
             {
                 if (htmlElement.SelectSingleNode("//body") != null)
                 {
-                    htmlElement = htmlSnippet.DocumentNode.SelectSingleNode("//body");
-                    htmlElement.Descendants()
-                        .Where(n => n.Name == "script" || n.Name == "style")
-                        .ToList()
-                        .ForEach(n => n.Remove());
+                    htmlElement = htmlElement.SelectSingleNode("//body");
                 }
-
             }
+            
             var divsByWordSection1Class = htmlElement.SelectNodes("//div[@class = 'WordSection1']");
             // Finding messages created by outlook
             if (divsByWordSection1Class?.Count > 0)
@@ -398,19 +399,20 @@ namespace AzureDevopsPlugin
                 return borderSplitted[0];
             }
 
-            //var htmlSplittedByOriginalMessageLabel = html.Split(new string[] { "----Original Message-----" }, StringSplitOptions.None);
-            //if (htmlSplittedByOriginalMessageLabel.Length > 1)
-            //{
-            //    return htmlSplittedByOriginalMessageLabel[0].Trim();
-            //}
-
-            ///// finding last reply for messages sent from email
-            //var divsByLtrDir = htmlSnippet.DocumentNode.SelectNodes("//div[@dir = 'ltr']");
-            //if (divsByLtrDir?.Count > 0)
-            //{
-            //    return divsByLtrDir[0].OuterHtml.Trim();
-            //}
             return htmlElement.OuterHtml;
+        }
+
+        public static void RemoveStyleAttributes(HtmlAgilityPack.HtmlDocument html)
+        {
+            var elementsWithStyleAttribute = html.DocumentNode.SelectNodes("//@style");
+
+            if (elementsWithStyleAttribute != null)
+            {
+                foreach (var element in elementsWithStyleAttribute)
+                {
+                    element.Attributes["style"].Remove();
+                }
+            }
         }
 
         public static string RemoveSubjectAbbreviationsFromSubject(string subject)
