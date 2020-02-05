@@ -55,13 +55,21 @@ namespace AzureDevopsPlugin.Forms
             Settings.settings.SetSettingsChangedNotification(() =>
             {
                 categoriesComboBox.Items.Clear();
+                categoriesComboBox.SelectedItem = null;
                 if (Settings.settings.CategoryCustomFieldValues?.Count > 0)
                 {
+                    var selectedIndex = 0;
+                    var i = 0;
                     foreach (var item in Settings.settings.CategoryCustomFieldValues)
                     {
+                        if (item == Settings.settings.CategoryCustomFieldDefaultValue)
+                        {
+                            selectedIndex = i;
+                        }
                         categoriesComboBox.Items.Add(item);
+                        i++;
                     }
-                    categoriesComboBox.SelectedIndex = 0;
+                    categoriesComboBox.SelectedIndex = selectedIndex;
                 }
             });
         }
@@ -109,7 +117,7 @@ namespace AzureDevopsPlugin.Forms
                     ChangeEnabledStateOfControls(false);
                     var category = categoriesComboBox.Text;
                     var title = titleTextBox.Text;
-                    var description = descriptionTextBox.BodyHtml;
+                    var description = descriptionTextBox.DocumentText;
                     var withAttachments = includeAttachmentsCheckBox.Checked;
                     var createdWorkItem = Utility.CreateWorkItem(title, description, category, _outlookItem.Attachments, withAttachments);
                     var workItemCreatedForm = new WorkItemCreated(createdWorkItem.Id.Value);
@@ -138,23 +146,16 @@ namespace AzureDevopsPlugin.Forms
         private void ResetFields()
         {
             titleTextBox.Text = Utility.RemoveSubjectAbbreviationsFromSubject(_outlookItem.Subject);
-            //descriptionTextBox.Text = Regex.Replace(selObject.Body , @"^\s+$[\r\n]*", string.Empty, RegexOptions.Multiline);
-            descriptionTextBox.BodyHtml = Utility.GetLastMessageFromMessageHTMLBody(_outlookItem);
+            descriptionTextBox.Html = Utility.GetLastMessageFromMessageHTMLBody(_outlookItem.HTMLBody);
         }
-
-        private void titleTextBox_TextChanged(object sender, EventArgs e)
-        {
-
-        }
-
         private void setOriginalBodyBtn_Click(object sender, EventArgs e)
         {
-            descriptionTextBox.BodyHtml = _outlookItem.HTMLBody;
+            descriptionTextBox.Html = _outlookItem.HTMLBody;
         }
 
         private void removeStylesButton_Click(object sender, EventArgs e)
         {
-            descriptionTextBox.BodyHtml = Utility.GetLastMessageFromMessageHTMLBody(_outlookItem, true);
+            descriptionTextBox.Html = Utility.ClearFormattingOfHtml(descriptionTextBox.DocumentText);
         }
     }
 }

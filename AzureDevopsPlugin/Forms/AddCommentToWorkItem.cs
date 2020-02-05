@@ -28,7 +28,7 @@ namespace AzureDevopsPlugin.Forms
             _workItem = workItem;
             _mailItem = mailItem;
             InitializeComponent();
-            commentTextBox.BodyHtml = Utility.GetLastMessageFromMessageHTMLBody(mailItem);
+            commentTextBox.Html = Utility.GetLastMessageFromMessageHTMLBody(mailItem.HTMLBody);
             workItemTextBox.Text = workItem.ToString();
             workItemTextBox.Enabled = false;
         }
@@ -63,7 +63,7 @@ namespace AzureDevopsPlugin.Forms
                 try
                 {
                     ChangeEnabledStateOfControls(false);
-                    var comment = commentTextBox.BodyHtml;
+                    var comment = commentTextBox.DocumentText;
                     var withAttachments = includeAttachmentsCheckBox.Checked;
                     var commentEntity = Utility.AddCommentToWorkItem(_workItem.Id, comment, _mailItem.Attachments, withAttachments);
                     this.Close();
@@ -83,12 +83,17 @@ namespace AzureDevopsPlugin.Forms
 
         private void useOriginalMessageBodyBtn_Click(object sender, EventArgs e)
         {
-            commentTextBox.BodyHtml = _mailItem.HTMLBody;
+            commentTextBox.Html = _mailItem.HTMLBody;
         }
 
         private void removeStylesButton_Click(object sender, EventArgs e)
         {
-            commentTextBox.BodyHtml = Utility.GetLastMessageFromMessageHTMLBody(_mailItem, true);
+            commentTextBox.Html = Utility.ClearFormattingOfHtml(commentTextBox.DocumentText);
+        }
+
+        private void resetButton_Click(object sender, EventArgs e)
+        {
+            commentTextBox.Html = Utility.GetLastMessageFromMessageHTMLBody(_mailItem.HTMLBody);
         }
     }
 }

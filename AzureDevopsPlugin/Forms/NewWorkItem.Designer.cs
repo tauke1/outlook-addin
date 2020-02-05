@@ -67,7 +67,6 @@
             this.titleTextBox.Name = "titleTextBox";
             this.titleTextBox.Size = new System.Drawing.Size(463, 20);
             this.titleTextBox.TabIndex = 10;
-            this.titleTextBox.TextChanged += new System.EventHandler(this.titleTextBox_TextChanged);
             // 
             // label1
             // 
@@ -133,10 +132,9 @@
             this.descriptionTextBox.BodyHtml = null;
             this.descriptionTextBox.BodyText = null;
             this.descriptionTextBox.DocumentText = resources.GetString("descriptionTextBox.DocumentText");
-            this.descriptionTextBox.EditorBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
+            this.descriptionTextBox.EditorBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.descriptionTextBox.EditorForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
-            this.descriptionTextBox.FontName = null;
-            this.descriptionTextBox.FontSize = LiveSwitch.TextControl.FontSize.NA;
+            this.descriptionTextBox.FontSize = LiveSwitch.TextControl.FontSize.Three;
             this.descriptionTextBox.Html = null;
             this.descriptionTextBox.Location = new System.Drawing.Point(22, 92);
             this.descriptionTextBox.Margin = new System.Windows.Forms.Padding(8, 7, 8, 7);
@@ -150,7 +148,7 @@
             this.removeStylesButton.Name = "removeStylesButton";
             this.removeStylesButton.Size = new System.Drawing.Size(105, 23);
             this.removeStylesButton.TabIndex = 31;
-            this.removeStylesButton.Text = "Delete formatting";
+            this.removeStylesButton.Text = "Clear formatting";
             this.removeStylesButton.UseVisualStyleBackColor = true;
             this.removeStylesButton.Click += new System.EventHandler(this.removeStylesButton_Click);
             // 

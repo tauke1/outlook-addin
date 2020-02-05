@@ -37,6 +37,7 @@
             this.label2 = new System.Windows.Forms.Label();
             this.removeStylesButton = new System.Windows.Forms.Button();
             this.commentTextBox = new LiveSwitch.TextControl.Editor();
+            this.resetButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // addCommentButton
@@ -60,7 +61,7 @@
             // 
             // useOriginalMessageBodyBtn
             // 
-            this.useOriginalMessageBodyBtn.Location = new System.Drawing.Point(483, 371);
+            this.useOriginalMessageBodyBtn.Location = new System.Drawing.Point(537, 371);
             this.useOriginalMessageBodyBtn.Name = "useOriginalMessageBodyBtn";
             this.useOriginalMessageBodyBtn.Size = new System.Drawing.Size(157, 23);
             this.useOriginalMessageBodyBtn.TabIndex = 24;
@@ -82,7 +83,7 @@
             // 
             this.workItemTextBox.Location = new System.Drawing.Point(9, 33);
             this.workItemTextBox.Name = "workItemTextBox";
-            this.workItemTextBox.Size = new System.Drawing.Size(645, 20);
+            this.workItemTextBox.Size = new System.Drawing.Size(704, 20);
             this.workItemTextBox.TabIndex = 29;
             // 
             // label2
@@ -95,11 +96,11 @@
             // 
             // removeStylesButton
             // 
-            this.removeStylesButton.Location = new System.Drawing.Point(358, 371);
+            this.removeStylesButton.Location = new System.Drawing.Point(315, 371);
             this.removeStylesButton.Name = "removeStylesButton";
             this.removeStylesButton.Size = new System.Drawing.Size(105, 23);
             this.removeStylesButton.TabIndex = 30;
-            this.removeStylesButton.Text = "Delete formatting";
+            this.removeStylesButton.Text = "Clear formatting";
             this.removeStylesButton.UseVisualStyleBackColor = true;
             this.removeStylesButton.Click += new System.EventHandler(this.removeStylesButton_Click);
             // 
@@ -109,21 +110,33 @@
             this.commentTextBox.BodyHtml = null;
             this.commentTextBox.BodyText = null;
             this.commentTextBox.DocumentText = resources.GetString("commentTextBox.DocumentText");
-            this.commentTextBox.EditorBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.commentTextBox.EditorBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
             this.commentTextBox.EditorForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(0)))), ((int)(((byte)(0)))));
-            this.commentTextBox.FontSize = LiveSwitch.TextControl.FontSize.Three;
+            this.commentTextBox.FontName = null;
+            this.commentTextBox.FontSize = LiveSwitch.TextControl.FontSize.NA;
             this.commentTextBox.Html = null;
             this.commentTextBox.Location = new System.Drawing.Point(10, 78);
             this.commentTextBox.Margin = new System.Windows.Forms.Padding(8, 7, 8, 7);
             this.commentTextBox.Name = "commentTextBox";
-            this.commentTextBox.Size = new System.Drawing.Size(645, 283);
+            this.commentTextBox.Size = new System.Drawing.Size(703, 283);
             this.commentTextBox.TabIndex = 22;
+            // 
+            // resetButton
+            // 
+            this.resetButton.Location = new System.Drawing.Point(426, 371);
+            this.resetButton.Name = "resetButton";
+            this.resetButton.Size = new System.Drawing.Size(105, 23);
+            this.resetButton.TabIndex = 31;
+            this.resetButton.Text = "Reset fields";
+            this.resetButton.UseVisualStyleBackColor = true;
+            this.resetButton.Click += new System.EventHandler(this.resetButton_Click);
             // 
             // AddCommentToWorkItem
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(672, 398);
+            this.ClientSize = new System.Drawing.Size(721, 398);
+            this.Controls.Add(this.resetButton);
             this.Controls.Add(this.removeStylesButton);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.workItemTextBox);
@@ -132,7 +145,7 @@
             this.Controls.Add(this.label1);
             this.Controls.Add(this.commentTextBox);
             this.Controls.Add(this.addCommentButton);
-            this.Margin = new System.Windows.Forms.Padding(1, 1, 1, 1);
+            this.Margin = new System.Windows.Forms.Padding(1);
             this.Name = "AddCommentToWorkItem";
             this.Text = "Add Comment To Work Item";
             this.ResumeLayout(false);
@@ -150,5 +163,6 @@
         private System.Windows.Forms.TextBox workItemTextBox;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Button removeStylesButton;
+        private System.Windows.Forms.Button resetButton;
     }
 }
