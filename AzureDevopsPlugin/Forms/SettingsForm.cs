@@ -8,6 +8,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -15,6 +16,7 @@ namespace AzureDevopsPlugin.Forms
 {
     public partial class SettingsForm : Form
     {
+        private readonly SynchronizationContext _syncContext;
         public SettingsForm()
         {
             InitializeComponent();
@@ -23,9 +25,28 @@ namespace AzureDevopsPlugin.Forms
             patTokenTextBox.Text = Settings.settings.PatToken;
             customCategoryFieldTextBox.Text = Settings.settings.CategoryCustomFieldName;
             workItemTypeTextBox.Text = Settings.settings.WorkItemType;
-            if (Validate(false))
+            if (SynchronizationContext.Current == null)
             {
-                FillCategoriesComboBox();
+                SynchronizationContext.SetSynchronizationContext(new WindowsFormsSynchronizationContext());
+            }
+
+            _syncContext = SynchronizationContext.Current;
+        }
+
+
+        public async Task FillCustomCategoryFieldValuesComboBox(bool showError = true)
+        {
+            try
+            {
+                _syncContext.Send(new SendOrPostCallback((state) => ChangeEnabledStateOfControls(false)), null);
+                if (await Validate(showError))
+                {
+                    _syncContext.Send(new SendOrPostCallback((state) => FillCategoriesComboBox()), null);
+                }
+            }
+            finally
+            {
+                _syncContext.Send(new SendOrPostCallback((state) => ChangeEnabledStateOfControls(true)), null);
             }
         }
 
@@ -52,7 +73,7 @@ namespace AzureDevopsPlugin.Forms
             }
         }
 
-        private bool Validate(bool showMessage = true)
+        private async Task<bool> Validate(bool showMessage = true)
         {
             var orgName = orgNameTextBox.Text != null ? orgNameTextBox.Text.Trim() : null;
             var projectName = projectNameTextBox.Text != null ? projectNameTextBox.Text.Trim() : null;
@@ -96,7 +117,8 @@ namespace AzureDevopsPlugin.Forms
                 {
                     var witClient = Utility.GetTFSHttpClient<WorkItemTrackingHttpClient>(orgName, patToken);
                     var witProcessClient = Utility.GetTFSHttpClient<WorkItemTrackingProcessHttpClient>(orgName, patToken);
-                    return Utility.ValidateVssSettings(workItemType, projectName, customCategoryField, witClient, witProcessClient);
+                    await Utility.ValidateVssSettings(workItemType, projectName, customCategoryField, witClient, witProcessClient);
+                    return true;
                 }
                 catch (System.Exception ex)
                 {
@@ -110,15 +132,25 @@ namespace AzureDevopsPlugin.Forms
             return false;
         }
 
-        private void saveButton_Click(object sender, EventArgs e)
+        private void ChangeEnabledStateOfControls(bool state)
         {
+            foreach (Control control in this.Controls)
+            {
+                control.Enabled = state;
+            }
+        }
+
+        private async void saveButton_Click(object sender, EventArgs e)
+        {
+
+            _syncContext.Send(new SendOrPostCallback((state) => ChangeEnabledStateOfControls(false)), null);
             var orgName = orgNameTextBox.Text != null ? orgNameTextBox.Text.Trim() : null;
             var projectName = projectNameTextBox.Text != null ? projectNameTextBox.Text.Trim() : null;
             var patToken = patTokenTextBox.Text != null ? patTokenTextBox.Text.Trim() : null;
             var customCategoryField = customCategoryFieldTextBox.Text != null ? customCategoryFieldTextBox.Text.Trim() : null;
             var workItemType = workItemTypeTextBox.Text != null ? workItemTypeTextBox.Text.Trim() : null;
 
-            if (Validate())
+            if (await Validate())
             {
                 string customDefaultCategory = null;
                 if (defaultCategoryComboBox.SelectedItem != null)
@@ -139,17 +171,25 @@ namespace AzureDevopsPlugin.Forms
                 Settings.settings.WorkItemType = workItemType;
                 Settings.settings.CategoryCustomFieldDefaultValue = customDefaultCategory;
                 Settings.settings.Save();
-                Settings.settings.SendSettingsChangedNotification();
-                this.Close();
+                _syncContext.Send(new SendOrPostCallback((state) =>
+                {
+                    Settings.settings.SendSettingsChangedNotification();
+                    this.Close();
+
+                }), null);
+
             }
         }
 
-        private void reloadCustomFields_Click(object sender, EventArgs e)
+        private async void reloadCustomFields_Click(object sender, EventArgs e)
         {
-            if (Validate())
-            {
-                FillCategoriesComboBox();
-            }
+            await FillCustomCategoryFieldValuesComboBox();
+        }
+
+        private async void SettingsForm_Load(object sender, EventArgs e)
+        {
+            await Task.Delay(200);
+            await FillCustomCategoryFieldValuesComboBox(false);
         }
     }
 }

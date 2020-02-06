@@ -30,14 +30,15 @@
         {
             this.openBrowser = new System.Windows.Forms.Button();
             this.workItemLabel = new System.Windows.Forms.Label();
+            this.okButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // openBrowser
             // 
-            this.openBrowser.Location = new System.Drawing.Point(258, 332);
+            this.openBrowser.Location = new System.Drawing.Point(436, 328);
             this.openBrowser.Name = "openBrowser";
             this.openBrowser.Size = new System.Drawing.Size(273, 55);
-            this.openBrowser.TabIndex = 0;
+            this.openBrowser.TabIndex = 2;
             this.openBrowser.Text = "Open in browser";
             this.openBrowser.UseVisualStyleBackColor = true;
             this.openBrowser.Click += new System.EventHandler(this.openBrowser_Click);
@@ -51,11 +52,22 @@
             this.workItemLabel.TabIndex = 1;
             this.workItemLabel.Text = "workItemLabel";
             // 
+            // okButton
+            // 
+            this.okButton.Location = new System.Drawing.Point(90, 328);
+            this.okButton.Name = "okButton";
+            this.okButton.Size = new System.Drawing.Size(273, 55);
+            this.okButton.TabIndex = 1;
+            this.okButton.Text = "OK";
+            this.okButton.UseVisualStyleBackColor = true;
+            this.okButton.Click += new System.EventHandler(this.okButton_Click);
+            // 
             // WorkItemCreated
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(16F, 31F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.okButton);
             this.Controls.Add(this.workItemLabel);
             this.Controls.Add(this.openBrowser);
             this.Name = "WorkItemCreated";
@@ -69,5 +81,6 @@
 
         private System.Windows.Forms.Button openBrowser;
         private System.Windows.Forms.Label workItemLabel;
+        private System.Windows.Forms.Button okButton;
     }
 }

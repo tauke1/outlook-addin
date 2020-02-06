@@ -10,6 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -18,11 +19,7 @@ namespace AzureDevopsPlugin.Forms
     public partial class NewWorkItem : Form
     {
         private readonly MailItem _outlookItem;
-
-        public NewWorkItem()
-        {
-
-        }
+        private readonly SynchronizationContext _syncContext;
 
         public NewWorkItem(MailItem outlookItem)
         {
@@ -49,7 +46,13 @@ namespace AzureDevopsPlugin.Forms
                 }
 
                 categoriesComboBox.SelectedIndex = selectedIndex;
-            }
+
+                if (SynchronizationContext.Current == null)
+                {
+                    SynchronizationContext.SetSynchronizationContext(new WindowsFormsSynchronizationContext());
+                }
+                _syncContext = SynchronizationContext.Current;
+    }
 
 
             Settings.settings.SetSettingsChangedNotification(() =>
@@ -103,36 +106,41 @@ namespace AzureDevopsPlugin.Forms
 
         private void ChangeEnabledStateOfControls(bool state)
         {
-            categoriesComboBox.Enabled = state;
-            descriptionTextBox.Enabled = state;
-            includeAttachmentsCheckBox.Enabled = state;
+            foreach (Control control in this.Controls)
+            {
+                control.Enabled = state;
+            }
         }
 
-        private void workItemCreateBtn_Click(object sender, EventArgs e)
+        private async void workItemCreateBtn_Click(object sender, EventArgs e)
         {
             if (Settings.settings.Validate() && ValidateWorkItemFields())
             {
                 try
                 {
-                    ChangeEnabledStateOfControls(false);
+                    _syncContext.Send(new SendOrPostCallback((state) => ChangeEnabledStateOfControls(false)), null); 
                     var category = categoriesComboBox.Text;
                     var title = titleTextBox.Text;
                     var description = descriptionTextBox.DocumentText;
                     var withAttachments = includeAttachmentsCheckBox.Checked;
-                    var createdWorkItem = Utility.CreateWorkItem(title, description, category, _outlookItem.Attachments, withAttachments);
-                    var workItemCreatedForm = new WorkItemCreated(createdWorkItem.Id.Value);
-                    workItemCreatedForm.StartPosition = FormStartPosition.CenterParent;
-                    workItemCreatedForm.ShowDialog();
-                    this.Close();
+                    var createdWorkItem = await Utility.CreateWorkItem(title, description, category, _outlookItem.Attachments, withAttachments);
+                    _syncContext.Send(new SendOrPostCallback((state) => {
+                        var workItemCreatedForm = new WorkItemCreated(createdWorkItem.Id.Value);
+                        workItemCreatedForm.StartPosition = FormStartPosition.CenterParent;
+                        workItemCreatedForm.ShowDialog();
+                        this.Close(); 
+                    }), null);
                 }
                 catch (System.Exception ex)
                 {
-                    MessageBox.Show(Utility.ProcessException(ex), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    _syncContext.Send(new SendOrPostCallback((state) => MessageBox.Show(Utility.ProcessException(ex), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)),null);
                 }
                 finally
                 {
-                    Globals.ThisAddIn.ChangeTaskPaneVisibility(false);
-                    ChangeEnabledStateOfControls(true);
+                    _syncContext.Send(new SendOrPostCallback((state) => {
+                        Globals.ThisAddIn.ChangeTaskPaneVisibility(false);
+                        ChangeEnabledStateOfControls(true);
+                    }), null);
                 }
 
             }

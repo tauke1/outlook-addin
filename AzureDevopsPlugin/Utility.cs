@@ -15,6 +15,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -52,7 +53,7 @@ namespace AzureDevopsPlugin
         /// </summary>
         /// <param name="filePath">file to copy</param>
         /// <returns></returns>
-        public static AttachmentReference CreateAttachment(string filePath)
+        public async static Task<AttachmentReference> CreateAttachment(string filePath)
         {
             var workitemClient = GetTFSHttpClient<WorkItemTrackingHttpClient>();
             if (workitemClient != null)
@@ -60,7 +61,7 @@ namespace AzureDevopsPlugin
                 using (FileStream attStream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
                 {
                     var fileName = Path.GetFileName(filePath);
-                    return workitemClient.CreateAttachmentAsync(attStream, uploadType: "simple", fileName: fileName).Result; // upload the file
+                    return await workitemClient.CreateAttachmentAsync(attStream, uploadType: "simple", fileName: fileName, cancellationToken: GetCancellationToken(20)); // upload the file
 
                 }
             }
@@ -77,7 +78,7 @@ namespace AzureDevopsPlugin
         /// <param name="attachments"></param>
         /// <param name="withAttachments"></param>
         /// <returns></returns>
-        public static WorkItem CreateWorkItem(string title, string description, string category, Attachments attachments = null, bool withAttachments = false)
+        public async static Task<WorkItem> CreateWorkItem(string title, string description, string category, Attachments attachments = null, bool withAttachments = false)
         {
             var workitemClient = GetTFSHttpClient<WorkItemTrackingHttpClient>();
             if (workitemClient != null)
@@ -89,7 +90,7 @@ namespace AzureDevopsPlugin
                     {
                         var savePath = System.IO.Path.GetTempPath() + att.FileName;
                         att.SaveAsFile(savePath);
-                        var savedAttachment = CreateAttachment(savePath);
+                        var savedAttachment = await CreateAttachment(savePath);
                         document.Add(CreateAttachmentJsonPatchOperation(savedAttachment));
                         File.Delete(savePath);
                     }
@@ -126,7 +127,7 @@ namespace AzureDevopsPlugin
                     Value = category
                 });
 
-                return workitemClient.CreateWorkItemAsync(document, Settings.settings.ProjectName, Settings.settings.WorkItemType).Result;
+                return await workitemClient.CreateWorkItemAsync(document, Settings.settings.ProjectName, Settings.settings.WorkItemType);
             }
 
             throw new System.Exception("Settings is not valid!");
@@ -154,12 +155,12 @@ namespace AzureDevopsPlugin
         /// <param name="attachments">attachments</param>
         /// <param name="withAttachments">include attachments flag</param>
         /// <returns></returns>
-        public static Comment AddCommentToWorkItem(int workItemId, string comment, Attachments attachments = null, bool withAttachments = false)
+        public async static Task<Comment> AddCommentToWorkItem(int workItemId, string comment, Attachments attachments = null, bool withAttachments = false)
         {
             var workItemsClient = GetTFSHttpClient<WorkItemTrackingHttpClient>();
             if (workItemsClient != null)
             {
-                var workItem = workItemsClient.GetWorkItemAsync(workItemId).Result;
+                var workItem = await workItemsClient.GetWorkItemAsync(workItemId, cancellationToken: GetCancellationToken(20));
                 if (withAttachments && attachments?.Count > 0)
                 {
                     var updateDocument = new JsonPatchDocument();
@@ -168,15 +169,15 @@ namespace AzureDevopsPlugin
                     {
                         var savePath = System.IO.Path.GetTempPath() + att.FileName;
                         att.SaveAsFile(savePath);
-                        var attachment = CreateAttachment(savePath);
+                        var attachment = await CreateAttachment(savePath);
                         updateDocument.Add(CreateAttachmentJsonPatchOperation(attachment));
                         comment += $"<br>attachment {i} file name: {att.FileName}";
                         File.Delete(savePath);
                         i++;
                     }
-                    workItemsClient.UpdateWorkItemAsync(updateDocument, workItem.Id.Value).Wait();
+                    await workItemsClient.UpdateWorkItemAsync(updateDocument, workItem.Id.Value);
                 }
-                return workItemsClient.AddCommentAsync(new CommentCreate { Text = comment }, Settings.settings.ProjectName, workItem.Id.Value).Result;
+                return await workItemsClient.AddCommentAsync(new CommentCreate { Text = comment }, Settings.settings.ProjectName, workItem.Id.Value, cancellationToken: GetCancellationToken(20));
             }
 
             throw new System.Exception("Bad settings!");
@@ -209,7 +210,7 @@ namespace AzureDevopsPlugin
                 var result = await workitemClient.QueryByWiqlAsync(wiql);
                 if (result.WorkItems.Count() > 0)
                 {
-                    var workItems = workitemClient.GetWorkItemsAsync(result.WorkItems.Select(a => a.Id), new List<string> { "System.State", "System.Title" }).Result;
+                    var workItems = await workitemClient.GetWorkItemsAsync(result.WorkItems.Select(a => a.Id), new List<string> { "System.State", "System.Title" }, cancellationToken: GetCancellationToken(20));
                     foreach (var workItem in workItems)
                     {
                         if (!workItem.Id.HasValue)
@@ -227,78 +228,24 @@ namespace AzureDevopsPlugin
             throw new System.Exception("bad settings file");
         }
 
-        //public static (IList<string> ,string) CheckCategoryExistsAndGetCustomFieldPickList(string customField, string workItemType)
-        //{
-        //    var witClient = GetTFSHttpClient<WorkItemTrackingHttpClient>();
-        //    var witTrackingClient = GetTFSHttpClient<WorkItemTrackingProcessHttpClient>();
-        //    string errors = "";
-        //    var patIsValid = true;
-        //    try
-        //    {
-        //        witClient.GetWorkItemTypeAsync(Settings.settings.ProjectName, workItemType).Wait();
-        //    }
-        //    catch (System.Exception ex)
-        //    {
-        //        if (ex.InnerException != null)
-        //        {
-        //            errors += "\n" + ex.InnerException.Message;
-        //            if (ex.InnerException is VssUnauthorizedException)
-        //            {
-        //                return (null, errors);
-        //            }
-        //        }
-        //        else
-        //        {
-        //            errors += "\n" + ex.Message;
-        //        }
-        //    }
-
-        //    IList<string> pickListValues;
-        //    if (patIsValid)
-        //    {
-        //        var refName = "Custom." + customField;
-        //        try
-        //        {
-        //            pickListValues = GetCustomFieldPickListValue(refName);
-        //        }
-        //        catch (System.Exception ex)
-        //        {
-        //            if (ex.InnerException != null)
-        //            {
-        //                errors += "\n" + ex.InnerException.Message;
-        //                if (ex.InnerException is VssUnauthorizedException)
-        //                {
-        //                    return (null, errors); ;
-        //                }
-        //            }
-        //            else
-        //            {
-        //                errors += "\n" + ex.Message;
-        //            }
-        //        }
-        //    }
-
-        //    return (null, errors); ;
-        //}
-
-        public static IList<string> GetCustomFieldPickListValue(string fieldName)
+        public async static Task<IList<string>> GetCustomFieldPickListValue(string fieldName)
         {
             var witClient = GetTFSHttpClient<WorkItemTrackingHttpClient>();
             var witTrackingClient = GetTFSHttpClient<WorkItemTrackingProcessHttpClient>();
-            return GetCustomFieldPickListValue(fieldName, witClient, witTrackingClient);
+            return await GetCustomFieldPickListValue(fieldName, witClient, witTrackingClient);
         }
 
-        public static IList<string> GetCustomFieldPickListValue(string fieldName, WorkItemTrackingHttpClient witClient, WorkItemTrackingProcessHttpClient witTrackingClient)
+        public async static Task<IList<string>> GetCustomFieldPickListValue(string fieldName, WorkItemTrackingHttpClient witClient, WorkItemTrackingProcessHttpClient witTrackingClient)
         {
             if (witClient == null && witTrackingClient == null)
             {
                 throw new System.Exception("bad configs file");
             }
 
-            var field = witClient.GetFieldAsync("Custom." + fieldName).Result;
+            var field = await witClient.GetFieldAsync("Custom." + fieldName);
             if (field.IsPicklist)
             {
-                var pickList = witTrackingClient.GetListAsync(field.PicklistId.Value).Result;
+                var pickList = await witTrackingClient.GetListAsync(field.PicklistId.Value, GetCancellationToken(20));
                 if (pickList?.Items?.Count == 0)
                 {
                     throw new System.Exception(fieldName + " field zero elements in picklist");
@@ -312,7 +259,7 @@ namespace AzureDevopsPlugin
             }
         }
 
-        public static bool ValidateVssSettings()
+        public async static Task<bool> ValidateVssSettings()
         {
             try
             {
@@ -322,7 +269,8 @@ namespace AzureDevopsPlugin
                 }
                 var witClient = GetTFSHttpClient<WorkItemTrackingHttpClient>();
                 var witProcessClient = GetTFSHttpClient<WorkItemTrackingProcessHttpClient>();
-                return ValidateVssSettings(Settings.settings.WorkItemType, Settings.settings.ProjectName, Settings.settings.CategoryCustomFieldName, witClient, witProcessClient);
+                await ValidateVssSettings(Settings.settings.WorkItemType, Settings.settings.ProjectName, Settings.settings.CategoryCustomFieldName, witClient, witProcessClient);
+                return true;
             }
             catch (System.Exception ex)
             {
@@ -331,30 +279,15 @@ namespace AzureDevopsPlugin
             return false;
         }
 
-        public static bool ValidateVssSettings(string workItemType, string projectName, string customCategoryField, WorkItemTrackingHttpClient witClient, WorkItemTrackingProcessHttpClient witProcessClient)
+        public async static Task ValidateVssSettings(string workItemType, string projectName, string customCategoryField, WorkItemTrackingHttpClient witClient, WorkItemTrackingProcessHttpClient witProcessClient)
         {
             if (string.IsNullOrEmpty(workItemType) || string.IsNullOrEmpty(projectName) || string.IsNullOrEmpty(customCategoryField) || witClient == null || witProcessClient == null)
             {
                 throw new ArgumentNullException("bad arguments");
             }
-            var errorMessage = "";
-            try
-            {
-                var customFieldValues = Utility.GetCustomFieldPickListValue(customCategoryField, witClient, witProcessClient);
-                Settings.settings.CategoryCustomFieldValues = customFieldValues;
-                witClient.GetWorkItemTypeAsync(projectName, workItemType).Wait();
-            }
-            catch (System.Exception ex)
-            {
-                errorMessage += ProcessException(ex);
-            }
-
-            if (!string.IsNullOrEmpty(errorMessage))
-            {
-                MessageBox.Show(errorMessage, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return false;
-            }
-            return true;
+            witClient.GetWorkItemTypeAsync(projectName, workItemType, cancellationToken: GetCancellationToken(20)).Wait();
+            var customFieldValues = await Utility.GetCustomFieldPickListValue(customCategoryField, witClient, witProcessClient);
+            Settings.settings.CategoryCustomFieldValues = customFieldValues;
         }
 
         public static string ProcessException(System.Exception ex) => ex.InnerException != null ? ex.InnerException is VssUnauthorizedException ? "PAT token is invalid, or has not enough permissions" : ex.InnerException.Message : ex.Message;
@@ -397,6 +330,18 @@ namespace AzureDevopsPlugin
             {
                 var splitted = htmlSnippet.DocumentNode.OuterHtml.Split(new string[] { divsByLtrDir[0].OuterHtml }, StringSplitOptions.None)[0];
                 return headNode != null ? headNode.OuterHtml + splitted : splitted;
+            }
+
+            return htmlSnippet.DocumentNode.OuterHtml;
+        }
+
+        public static string RemoveHeaderFromHtml(string html)
+        {
+            HtmlAgilityPack.HtmlDocument htmlSnippet = new HtmlAgilityPack.HtmlDocument();
+            htmlSnippet.LoadHtml(html);
+            if (htmlSnippet.DocumentNode.SelectSingleNode("//head") != null)
+            {
+                htmlSnippet.DocumentNode.RemoveChild(htmlSnippet.DocumentNode.SelectSingleNode("//head"));
             }
 
             return htmlSnippet.DocumentNode.OuterHtml;
@@ -449,5 +394,7 @@ namespace AzureDevopsPlugin
             form.Location = new Point(window.Left + ((window.Width - form.Width) / 2), window.Top + ((window.Height - form.Height) / 2));
             form.Show();
         }
+
+        public static CancellationToken GetCancellationToken(int seconds) => (new CancellationTokenSource(TimeSpan.FromSeconds(seconds))).Token;
     }
 }

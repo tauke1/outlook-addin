@@ -25,8 +25,8 @@ namespace AzureDevopsPlugin.Controls
             workItemGridView.Columns.Add("Color", "Color");
             workItemGridView.Columns.Add("Id", "Id");
             workItemGridView.Columns.Add("Title", "Title");
-            workItemGridView.Columns[0].Width = 1;
             workItemGridView.Columns[1].AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
+            workItemGridView.Columns[0].AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
         }
 
         public void FillTaskPane(List<Models.WorkItem> workItems, MailItem mailItem)
@@ -56,7 +56,7 @@ namespace AzureDevopsPlugin.Controls
             {
                 foreach (var workItem in workItems)
                 {
-                    workItemGridView.Rows.Add("", workItem.Id, workItem.Title);
+                    workItemGridView.Rows.Add(" ", workItem.Id, workItem.Title);
                     workItemGridView.Rows[i].Cells[0].Style.BackColor = workItem.StateColor;
                     i++;
                 }

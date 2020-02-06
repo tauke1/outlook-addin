@@ -47,9 +47,10 @@
             // saveButton
             // 
             this.saveButton.BackColor = System.Drawing.SystemColors.ActiveCaption;
-            this.saveButton.Location = new System.Drawing.Point(29, 255);
+            this.saveButton.Location = new System.Drawing.Point(77, 608);
+            this.saveButton.Margin = new System.Windows.Forms.Padding(8, 7, 8, 7);
             this.saveButton.Name = "saveButton";
-            this.saveButton.Size = new System.Drawing.Size(504, 23);
+            this.saveButton.Size = new System.Drawing.Size(1344, 55);
             this.saveButton.TabIndex = 0;
             this.saveButton.Text = "Save";
             this.saveButton.UseVisualStyleBackColor = false;
@@ -57,91 +58,102 @@
             // 
             // orgNameTextBox
             // 
-            this.orgNameTextBox.Location = new System.Drawing.Point(127, 40);
+            this.orgNameTextBox.Location = new System.Drawing.Point(339, 95);
+            this.orgNameTextBox.Margin = new System.Windows.Forms.Padding(8, 7, 8, 7);
             this.orgNameTextBox.Name = "orgNameTextBox";
-            this.orgNameTextBox.Size = new System.Drawing.Size(392, 20);
+            this.orgNameTextBox.Size = new System.Drawing.Size(1039, 38);
             this.orgNameTextBox.TabIndex = 1;
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(11, 43);
+            this.label1.Location = new System.Drawing.Point(29, 103);
+            this.label1.Margin = new System.Windows.Forms.Padding(8, 0, 8, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(97, 13);
+            this.label1.Size = new System.Drawing.Size(260, 32);
             this.label1.TabIndex = 4;
             this.label1.Text = "Organization Name";
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(12, 118);
+            this.label2.Location = new System.Drawing.Point(32, 281);
+            this.label2.Margin = new System.Windows.Forms.Padding(8, 0, 8, 0);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(58, 13);
+            this.label2.Size = new System.Drawing.Size(147, 32);
             this.label2.TabIndex = 5;
             this.label2.Text = "PAT token";
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(12, 78);
+            this.label3.Location = new System.Drawing.Point(32, 186);
+            this.label3.Margin = new System.Windows.Forms.Padding(8, 0, 8, 0);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(71, 13);
+            this.label3.Size = new System.Drawing.Size(186, 32);
             this.label3.TabIndex = 6;
             this.label3.Text = "Project Name";
             // 
             // customCategoryFieldTextBox
             // 
-            this.customCategoryFieldTextBox.Location = new System.Drawing.Point(127, 149);
+            this.customCategoryFieldTextBox.Location = new System.Drawing.Point(339, 355);
+            this.customCategoryFieldTextBox.Margin = new System.Windows.Forms.Padding(8, 7, 8, 7);
             this.customCategoryFieldTextBox.Name = "customCategoryFieldTextBox";
-            this.customCategoryFieldTextBox.Size = new System.Drawing.Size(392, 20);
+            this.customCategoryFieldTextBox.Size = new System.Drawing.Size(1039, 38);
             this.customCategoryFieldTextBox.TabIndex = 4;
             // 
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(12, 149);
+            this.label4.Location = new System.Drawing.Point(32, 355);
+            this.label4.Margin = new System.Windows.Forms.Padding(8, 0, 8, 0);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(100, 13);
+            this.label4.Size = new System.Drawing.Size(269, 32);
             this.label4.TabIndex = 8;
             this.label4.Text = "Category field name";
             // 
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(12, 181);
+            this.label5.Location = new System.Drawing.Point(32, 432);
+            this.label5.Margin = new System.Windows.Forms.Padding(8, 0, 8, 0);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(83, 13);
+            this.label5.Size = new System.Drawing.Size(211, 32);
             this.label5.TabIndex = 10;
             this.label5.Text = "Work Item Type";
             // 
             // workItemTypeTextBox
             // 
-            this.workItemTypeTextBox.Location = new System.Drawing.Point(127, 179);
+            this.workItemTypeTextBox.Location = new System.Drawing.Point(339, 427);
+            this.workItemTypeTextBox.Margin = new System.Windows.Forms.Padding(8, 7, 8, 7);
             this.workItemTypeTextBox.Name = "workItemTypeTextBox";
-            this.workItemTypeTextBox.Size = new System.Drawing.Size(392, 20);
+            this.workItemTypeTextBox.Size = new System.Drawing.Size(1039, 38);
             this.workItemTypeTextBox.TabIndex = 5;
             // 
             // projectNameTextBox
             // 
-            this.projectNameTextBox.Location = new System.Drawing.Point(127, 78);
+            this.projectNameTextBox.Location = new System.Drawing.Point(339, 186);
+            this.projectNameTextBox.Margin = new System.Windows.Forms.Padding(8, 7, 8, 7);
             this.projectNameTextBox.Name = "projectNameTextBox";
-            this.projectNameTextBox.Size = new System.Drawing.Size(392, 20);
+            this.projectNameTextBox.Size = new System.Drawing.Size(1039, 38);
             this.projectNameTextBox.TabIndex = 2;
             // 
             // patTokenTextBox
             // 
-            this.patTokenTextBox.Location = new System.Drawing.Point(127, 115);
+            this.patTokenTextBox.Location = new System.Drawing.Point(339, 274);
+            this.patTokenTextBox.Margin = new System.Windows.Forms.Padding(8, 7, 8, 7);
             this.patTokenTextBox.Name = "patTokenTextBox";
             this.patTokenTextBox.PasswordChar = '*';
-            this.patTokenTextBox.Size = new System.Drawing.Size(392, 20);
+            this.patTokenTextBox.Size = new System.Drawing.Size(1039, 38);
             this.patTokenTextBox.TabIndex = 3;
             // 
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(12, 210);
+            this.label6.Location = new System.Drawing.Point(32, 501);
+            this.label6.Margin = new System.Windows.Forms.Padding(8, 0, 8, 0);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(85, 13);
+            this.label6.Size = new System.Drawing.Size(222, 32);
             this.label6.TabIndex = 12;
             this.label6.Text = "Default category";
             // 
@@ -149,18 +161,18 @@
             // 
             this.defaultCategoryComboBox.Enabled = false;
             this.defaultCategoryComboBox.FormattingEnabled = true;
-            this.defaultCategoryComboBox.Location = new System.Drawing.Point(127, 210);
-            this.defaultCategoryComboBox.Margin = new System.Windows.Forms.Padding(1, 1, 1, 1);
+            this.defaultCategoryComboBox.Location = new System.Drawing.Point(339, 501);
+            this.defaultCategoryComboBox.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.defaultCategoryComboBox.Name = "defaultCategoryComboBox";
-            this.defaultCategoryComboBox.Size = new System.Drawing.Size(322, 21);
+            this.defaultCategoryComboBox.Size = new System.Drawing.Size(852, 39);
             this.defaultCategoryComboBox.TabIndex = 6;
             // 
             // reloadCustomFields
             // 
-            this.reloadCustomFields.Location = new System.Drawing.Point(460, 211);
-            this.reloadCustomFields.Margin = new System.Windows.Forms.Padding(1, 1, 1, 1);
+            this.reloadCustomFields.Location = new System.Drawing.Point(1227, 503);
+            this.reloadCustomFields.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.reloadCustomFields.Name = "reloadCustomFields";
-            this.reloadCustomFields.Size = new System.Drawing.Size(59, 20);
+            this.reloadCustomFields.Size = new System.Drawing.Size(157, 48);
             this.reloadCustomFields.TabIndex = 14;
             this.reloadCustomFields.Text = "reload";
             this.reloadCustomFields.UseVisualStyleBackColor = true;
@@ -168,9 +180,9 @@
             // 
             // SettingsForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(16F, 31F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(557, 289);
+            this.ClientSize = new System.Drawing.Size(1485, 689);
             this.Controls.Add(this.reloadCustomFields);
             this.Controls.Add(this.defaultCategoryComboBox);
             this.Controls.Add(this.label6);
@@ -185,8 +197,10 @@
             this.Controls.Add(this.label1);
             this.Controls.Add(this.orgNameTextBox);
             this.Controls.Add(this.saveButton);
+            this.Margin = new System.Windows.Forms.Padding(8, 7, 8, 7);
             this.Name = "SettingsForm";
             this.Text = "Edit Settings";
+            this.Load += new System.EventHandler(this.SettingsForm_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 

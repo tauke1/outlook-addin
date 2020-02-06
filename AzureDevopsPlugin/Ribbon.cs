@@ -39,7 +39,7 @@ namespace AzureDevopsPlugin
     {
         private Office.IRibbonUI ribbon;
         private bool _createWorkItemButtonEnabled = true;
-        private readonly WindowsFormsSynchronizationContext synchronizationContext;
+        private readonly SynchronizationContext synchronizationContext;
         private IList<string> _pickListValues = new List<string>();
 
         public Ribbon()
@@ -48,7 +48,7 @@ namespace AzureDevopsPlugin
             {
                 SynchronizationContext.SetSynchronizationContext(new WindowsFormsSynchronizationContext());
             }
-            synchronizationContext = new WindowsFormsSynchronizationContext();
+            synchronizationContext = SynchronizationContext.Current;
         }
 
         public void EditSettings(Office.IRibbonControl control)
@@ -66,7 +66,7 @@ namespace AzureDevopsPlugin
             {
                 System.Diagnostics.Process.Start(Settings.settings.ProjectURL);
             }
-            catch(System.Exception ex)
+            catch (System.Exception ex)
             {
                 Utility.ProcessException(ex);
             }
@@ -77,28 +77,29 @@ namespace AzureDevopsPlugin
             return _createWorkItemButtonEnabled;
         }
 
-        public void CreateWorkItem(Office.IRibbonControl control)
+        public async void CreateWorkItem(Office.IRibbonControl control)
         {
-            if (Settings.settings.CategoryCustomFieldValues != null || Utility.ValidateVssSettings())
+            Globals.ThisAddIn.ChangeTaskPaneVisibility(false);
+            // Determine subject of selected item
+            Explorer explorer = Globals.ThisAddIn.Application.ActiveExplorer();
+            if (explorer != null && explorer.Selection != null && explorer.Selection.Count > 0)
             {
-                // Determine subject of selected item
-                Explorer explorer = Globals.ThisAddIn.Application.ActiveExplorer();
-                if (explorer != null && explorer.Selection != null && explorer.Selection.Count > 0)
+                var mailItem = explorer.Selection[1] as MailItem;
+                if (mailItem == null)
                 {
-                    var mailItem = explorer.Selection[1] as MailItem;
-                    if (mailItem == null)
-                    {
-                        return;
-                    }
+                    return;
+                }
 
-                    _createWorkItemButtonEnabled = false;
-                    ribbon.InvalidateControl("CreateWorkItem");
-                    Task.Run(() =>
+                _createWorkItemButtonEnabled = false;
+                ribbon.InvalidateControl("CreateWorkItem");
+                Task.Run(async () =>
+                {
+                    if (Settings.settings.CategoryCustomFieldValues != null || await Utility.ValidateVssSettings())
                     {
                         try
                         {
                             var workItems = Utility.FindWorkItemsByTitle(Utility.RemoveSubjectAbbreviationsFromSubject(mailItem.Subject)).Result;
-                            synchronizationContext.Post(new SendOrPostCallback(o => Globals.ThisAddIn.FillTaskPane(workItems, mailItem)), null);
+                            synchronizationContext.Send(new SendOrPostCallback(o => Globals.ThisAddIn.FillTaskPane(workItems, mailItem)), null);
                         }
                         catch (System.Exception ex)
                         {
@@ -108,8 +109,9 @@ namespace AzureDevopsPlugin
                         {
                             synchronizationContext.Send(new SendOrPostCallback(o => EnableCreateNewWorkItemButton()), null);
                         }
-                    });
-                }
+                    }
+                });
+
             }
         }
 
