@@ -98,7 +98,7 @@ namespace AzureDevopsPlugin.Forms
 
             if (string.IsNullOrEmpty(customCategoryField))
             {
-                errorMessage += "PAT token field is empty\n";
+                errorMessage += "customCategoryField token field is empty\n";
             }
 
             if (string.IsNullOrEmpty(workItemTypeTextBox.Text))
@@ -142,42 +142,47 @@ namespace AzureDevopsPlugin.Forms
 
         private async void saveButton_Click(object sender, EventArgs e)
         {
-
-            _syncContext.Send(new SendOrPostCallback((state) => ChangeEnabledStateOfControls(false)), null);
-            var orgName = orgNameTextBox.Text != null ? orgNameTextBox.Text.Trim() : null;
-            var projectName = projectNameTextBox.Text != null ? projectNameTextBox.Text.Trim() : null;
-            var patToken = patTokenTextBox.Text != null ? patTokenTextBox.Text.Trim() : null;
-            var customCategoryField = customCategoryFieldTextBox.Text != null ? customCategoryFieldTextBox.Text.Trim() : null;
-            var workItemType = workItemTypeTextBox.Text != null ? workItemTypeTextBox.Text.Trim() : null;
-
-            if (await Validate())
+            try
             {
-                string customDefaultCategory = null;
-                if (defaultCategoryComboBox.SelectedItem != null)
+                _syncContext.Send(new SendOrPostCallback((state) => ChangeEnabledStateOfControls(false)), null);
+                var orgName = orgNameTextBox.Text != null ? orgNameTextBox.Text.Trim() : null;
+                var projectName = projectNameTextBox.Text != null ? projectNameTextBox.Text.Trim() : null;
+                var patToken = patTokenTextBox.Text != null ? patTokenTextBox.Text.Trim() : null;
+                var customCategoryField = customCategoryFieldTextBox.Text != null ? customCategoryFieldTextBox.Text.Trim() : null;
+                var workItemType = workItemTypeTextBox.Text != null ? workItemTypeTextBox.Text.Trim() : null;
+
+                if (await Validate())
                 {
-                    foreach (var cat in Settings.settings.CategoryCustomFieldValues)
+                    string customDefaultCategory = null;
+                    if (defaultCategoryComboBox.SelectedItem != null)
                     {
-                        if (cat == (string)defaultCategoryComboBox.SelectedItem)
+                        foreach (var cat in Settings.settings.CategoryCustomFieldValues)
                         {
-                            customDefaultCategory = cat;
+                            if (cat == (string)defaultCategoryComboBox.SelectedItem)
+                            {
+                                customDefaultCategory = cat;
+                            }
                         }
                     }
+
+                    Settings.settings.CategoryCustomFieldName = customCategoryField;
+                    Settings.settings.OrgName = orgName;
+                    Settings.settings.ProjectName = projectName;
+                    Settings.settings.PatToken = patToken;
+                    Settings.settings.WorkItemType = workItemType;
+                    Settings.settings.CategoryCustomFieldDefaultValue = customDefaultCategory;
+                    Settings.settings.Save();
+                    _syncContext.Send(new SendOrPostCallback((state) =>
+                    {
+                        Settings.settings.SendSettingsChangedNotification();
+                        this.Close();
+
+                    }), null);
                 }
-
-                Settings.settings.CategoryCustomFieldName = customCategoryField;
-                Settings.settings.OrgName = orgName;
-                Settings.settings.ProjectName = projectName;
-                Settings.settings.PatToken = patToken;
-                Settings.settings.WorkItemType = workItemType;
-                Settings.settings.CategoryCustomFieldDefaultValue = customDefaultCategory;
-                Settings.settings.Save();
-                _syncContext.Send(new SendOrPostCallback((state) =>
-                {
-                    Settings.settings.SendSettingsChangedNotification();
-                    this.Close();
-
-                }), null);
-
+            }
+            finally
+            {
+                _syncContext.Send(new SendOrPostCallback((state) => ChangeEnabledStateOfControls(true)), null);
             }
         }
 
