@@ -73,7 +73,6 @@ namespace AzureDevopsPlugin.Forms
                 errorMessage += "field comment is empty\n";
             }
 
-
             if (statesComboBox.SelectedItem == null)
             {
                 errorMessage += "field State is empty";
