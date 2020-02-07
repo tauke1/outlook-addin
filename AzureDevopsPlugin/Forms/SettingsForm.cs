@@ -115,9 +115,7 @@ namespace AzureDevopsPlugin.Forms
             {
                 try
                 {
-                    var witClient = Utility.GetTFSHttpClient<WorkItemTrackingHttpClient>(orgName, patToken);
-                    var witProcessClient = Utility.GetTFSHttpClient<WorkItemTrackingProcessHttpClient>(orgName, patToken);
-                    await Utility.ValidateVssSettings(workItemType, projectName, customCategoryField, witClient, witProcessClient);
+                    await Utility.ValidateVssSettings(workItemType, projectName, customCategoryField, orgName, patToken);
                     return true;
                 }
                 catch (System.Exception ex)

@@ -38,7 +38,31 @@ namespace AzureDevopsPlugin.Forms
             {
                 SynchronizationContext.SetSynchronizationContext(new WindowsFormsSynchronizationContext());
             }
+
             _syncContext = SynchronizationContext.Current;
+            FillStatesComboBox();
+        }
+
+        private void FillStatesComboBox()
+        {
+            statesComboBox.Items.Clear();
+            statesComboBox.SelectedItem = null;
+            var i = 0;
+            var currentStatusIndex = -1;
+            foreach (var state in Models.WorkItem.GetStates())
+            {
+                if (_workItem.State.ToLower() == state.Key)
+                {
+                    currentStatusIndex = i;
+                }
+                statesComboBox.Items.Add(state.Value.Key);
+                i++;
+            }
+            if (currentStatusIndex == -1)
+            {
+                throw new System.Exception($"State {_workItem.State} not found in states list");
+            }
+            statesComboBox.SelectedIndex = currentStatusIndex;
         }
 
         private bool ValidateCommentFields()
@@ -49,11 +73,19 @@ namespace AzureDevopsPlugin.Forms
                 errorMessage += "field comment is empty\n";
             }
 
+
+            if (statesComboBox.SelectedItem == null)
+            {
+                errorMessage += "field State is empty";
+            }
+
             if (!string.IsNullOrEmpty(errorMessage))
             {
                 MessageBox.Show(errorMessage, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
+
+
 
             return true;
         }
@@ -72,19 +104,20 @@ namespace AzureDevopsPlugin.Forms
             {
                 try
                 {
-                    _syncContext.Send( new SendOrPostCallback((state)=> ChangeEnabledStateOfControls(false)), null);
+                    _syncContext.Send(new SendOrPostCallback((state) => ChangeEnabledStateOfControls(false)), null);
                     var comment = commentTextBox.DocumentText;
                     var withAttachments = includeAttachmentsCheckBox.Checked;
-                    var commentEntity = await Utility.AddCommentToWorkItem(_workItem.Id, comment, _mailItem.Attachments, withAttachments);
-                    _syncContext.Send(new SendOrPostCallback((state) => this.Close()),null);
+                    var commentEntity = await Utility.AddCommentToWorkItem(_workItem.Id, (string)statesComboBox.SelectedItem, comment, _mailItem.Attachments, withAttachments);
+                    _syncContext.Send(new SendOrPostCallback((state) => this.Close()), null);
                 }
                 catch (System.Exception ex)
                 {
-                    MessageBox.Show(Utility.ProcessException(ex),"Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show(Utility.ProcessException(ex), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
-                finally 
+                finally
                 {
-                    _syncContext.Send(new SendOrPostCallback((state) => {
+                    _syncContext.Send(new SendOrPostCallback((state) =>
+                    {
                         Globals.ThisAddIn.ChangeTaskPaneVisibility(false);
                         ChangeEnabledStateOfControls(true);
                     }), null);

@@ -38,11 +38,13 @@
             this.removeStylesButton = new System.Windows.Forms.Button();
             this.commentTextBox = new LiveSwitch.TextControl.Editor();
             this.resetButton = new System.Windows.Forms.Button();
+            this.statesComboBox = new System.Windows.Forms.ComboBox();
+            this.label3 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // addCommentButton
             // 
-            this.addCommentButton.Location = new System.Drawing.Point(8, 367);
+            this.addCommentButton.Location = new System.Drawing.Point(9, 435);
             this.addCommentButton.Name = "addCommentButton";
             this.addCommentButton.Size = new System.Drawing.Size(139, 23);
             this.addCommentButton.TabIndex = 21;
@@ -53,7 +55,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(7, 62);
+            this.label1.Location = new System.Drawing.Point(7, 126);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(60, 13);
             this.label1.TabIndex = 23;
@@ -61,7 +63,7 @@
             // 
             // useOriginalMessageBodyBtn
             // 
-            this.useOriginalMessageBodyBtn.Location = new System.Drawing.Point(537, 371);
+            this.useOriginalMessageBodyBtn.Location = new System.Drawing.Point(538, 439);
             this.useOriginalMessageBodyBtn.Name = "useOriginalMessageBodyBtn";
             this.useOriginalMessageBodyBtn.Size = new System.Drawing.Size(157, 23);
             this.useOriginalMessageBodyBtn.TabIndex = 24;
@@ -72,7 +74,7 @@
             // includeAttachmentsCheckBox
             // 
             this.includeAttachmentsCheckBox.AutoSize = true;
-            this.includeAttachmentsCheckBox.Location = new System.Drawing.Point(153, 371);
+            this.includeAttachmentsCheckBox.Location = new System.Drawing.Point(154, 439);
             this.includeAttachmentsCheckBox.Name = "includeAttachmentsCheckBox";
             this.includeAttachmentsCheckBox.Size = new System.Drawing.Size(121, 17);
             this.includeAttachmentsCheckBox.TabIndex = 28;
@@ -96,7 +98,7 @@
             // 
             // removeStylesButton
             // 
-            this.removeStylesButton.Location = new System.Drawing.Point(315, 371);
+            this.removeStylesButton.Location = new System.Drawing.Point(316, 439);
             this.removeStylesButton.Name = "removeStylesButton";
             this.removeStylesButton.Size = new System.Drawing.Size(105, 23);
             this.removeStylesButton.TabIndex = 30;
@@ -115,7 +117,7 @@
             this.commentTextBox.FontName = null;
             this.commentTextBox.FontSize = LiveSwitch.TextControl.FontSize.NA;
             this.commentTextBox.Html = null;
-            this.commentTextBox.Location = new System.Drawing.Point(10, 78);
+            this.commentTextBox.Location = new System.Drawing.Point(9, 146);
             this.commentTextBox.Margin = new System.Windows.Forms.Padding(8, 7, 8, 7);
             this.commentTextBox.Name = "commentTextBox";
             this.commentTextBox.Size = new System.Drawing.Size(703, 283);
@@ -123,7 +125,7 @@
             // 
             // resetButton
             // 
-            this.resetButton.Location = new System.Drawing.Point(426, 371);
+            this.resetButton.Location = new System.Drawing.Point(427, 439);
             this.resetButton.Name = "resetButton";
             this.resetButton.Size = new System.Drawing.Size(105, 23);
             this.resetButton.TabIndex = 31;
@@ -131,11 +133,29 @@
             this.resetButton.UseVisualStyleBackColor = true;
             this.resetButton.Click += new System.EventHandler(this.resetButton_Click);
             // 
+            // statesComboBox
+            // 
+            this.statesComboBox.FormattingEnabled = true;
+            this.statesComboBox.Location = new System.Drawing.Point(9, 92);
+            this.statesComboBox.Name = "statesComboBox";
+            this.statesComboBox.Size = new System.Drawing.Size(704, 21);
+            this.statesComboBox.TabIndex = 32;
+            // 
+            // label3
+            // 
+            this.label3.Location = new System.Drawing.Point(7, 67);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(60, 13);
+            this.label3.TabIndex = 33;
+            this.label3.Text = "State";
+            // 
             // AddCommentToWorkItem
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(721, 398);
+            this.ClientSize = new System.Drawing.Size(721, 465);
+            this.Controls.Add(this.label3);
+            this.Controls.Add(this.statesComboBox);
             this.Controls.Add(this.resetButton);
             this.Controls.Add(this.removeStylesButton);
             this.Controls.Add(this.label2);
@@ -164,5 +184,7 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Button removeStylesButton;
         private System.Windows.Forms.Button resetButton;
+        private System.Windows.Forms.ComboBox statesComboBox;
+        private System.Windows.Forms.Label label3;
     }
 }

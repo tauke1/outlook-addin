@@ -48,6 +48,13 @@ namespace AzureDevopsPlugin
             return connection.GetClient<T>();
         }
 
+        public async static Task GetStates(string workItemType)
+        {
+            var workitemClient = GetTFSHttpClient<WorkItemTrackingHttpClient>();
+            var states = await workitemClient.GetWorkItemTypeStatesAsync(Settings.settings.ProjectName, workItemType, GetCancellationToken(20));
+            var b = 1 + 1;
+        }
+
         /// <summary>
         /// Create attachment in azure devops
         /// </summary>
@@ -155,15 +162,15 @@ namespace AzureDevopsPlugin
         /// <param name="attachments">attachments</param>
         /// <param name="withAttachments">include attachments flag</param>
         /// <returns></returns>
-        public async static Task<Comment> AddCommentToWorkItem(int workItemId, string comment, Attachments attachments = null, bool withAttachments = false)
+        public async static Task<Comment> AddCommentToWorkItem(int workItemId, string state , string comment, Attachments attachments = null, bool withAttachments = false)
         {
             var workItemsClient = GetTFSHttpClient<WorkItemTrackingHttpClient>();
             if (workItemsClient != null)
             {
                 var workItem = await workItemsClient.GetWorkItemAsync(workItemId, cancellationToken: GetCancellationToken(20));
+                var updateDocument = new JsonPatchDocument();
                 if (withAttachments && attachments?.Count > 0)
                 {
-                    var updateDocument = new JsonPatchDocument();
                     var i = 1;
                     foreach (Attachment att in attachments)
                     {
@@ -175,8 +182,17 @@ namespace AzureDevopsPlugin
                         File.Delete(savePath);
                         i++;
                     }
-                    await workItemsClient.UpdateWorkItemAsync(updateDocument, workItem.Id.Value);
                 }
+                // updating state
+                updateDocument.Add(
+                    new JsonPatchOperation()
+                    {
+                        Path = "/fields/System.State",
+                        Operation = Operation.Replace,
+                        Value = state
+                    });
+
+                await workItemsClient.UpdateWorkItemAsync(updateDocument, workItem.Id.Value);
                 return await workItemsClient.AddCommentAsync(new CommentCreate { Text = comment }, Settings.settings.ProjectName, workItem.Id.Value, cancellationToken: GetCancellationToken(20));
             }
 
@@ -267,9 +283,7 @@ namespace AzureDevopsPlugin
                 {
                     return false;
                 }
-                var witClient = GetTFSHttpClient<WorkItemTrackingHttpClient>();
-                var witProcessClient = GetTFSHttpClient<WorkItemTrackingProcessHttpClient>();
-                await ValidateVssSettings(Settings.settings.WorkItemType, Settings.settings.ProjectName, Settings.settings.CategoryCustomFieldName, witClient, witProcessClient);
+                await ValidateVssSettings(Settings.settings.WorkItemType, Settings.settings.ProjectName, Settings.settings.CategoryCustomFieldName, Settings.settings.OrgName, Settings.settings.PatToken);
                 return true;
             }
             catch (System.Exception ex)
@@ -279,14 +293,19 @@ namespace AzureDevopsPlugin
             return false;
         }
 
-        public async static Task ValidateVssSettings(string workItemType, string projectName, string customCategoryField, WorkItemTrackingHttpClient witClient, WorkItemTrackingProcessHttpClient witProcessClient)
+        public async static Task ValidateVssSettings(string workItemType, string projectName, string customCategoryField, string orgName, string patToken)
         {
-            if (string.IsNullOrEmpty(workItemType) || string.IsNullOrEmpty(projectName) || string.IsNullOrEmpty(customCategoryField) || witClient == null || witProcessClient == null)
+            if (string.IsNullOrEmpty(workItemType) || string.IsNullOrEmpty(projectName) || string.IsNullOrEmpty(customCategoryField) || string.IsNullOrEmpty(orgName) || string.IsNullOrEmpty(patToken))
             {
                 throw new ArgumentNullException("bad arguments");
             }
-            witClient.GetWorkItemTypeAsync(projectName, workItemType, cancellationToken: GetCancellationToken(20)).Wait();
-            var customFieldValues = await Utility.GetCustomFieldPickListValue(customCategoryField, witClient, witProcessClient);
+
+            var witClient = GetTFSHttpClient<WorkItemTrackingHttpClient>(orgName,patToken);
+            var witProcessClient = GetTFSHttpClient<WorkItemTrackingProcessHttpClient>(orgName, patToken);
+            var type = await witClient.GetWorkItemTypeAsync(projectName, workItemType, cancellationToken: GetCancellationToken(20));
+            var customFieldValues = await GetCustomFieldPickListValue(customCategoryField, witClient, witProcessClient);
+            var states = await witClient.GetWorkItemTypeStatesAsync(projectName, workItemType, GetCancellationToken(20));
+            Models.WorkItem.SetStates(states);
             Settings.settings.CategoryCustomFieldValues = customFieldValues;
         }
 

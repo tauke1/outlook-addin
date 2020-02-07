@@ -2,6 +2,7 @@
 using Microsoft.Office.Interop.Outlook;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -11,6 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
+using System.Windows.Input;
 using Office = Microsoft.Office.Core;
 
 // TODO:  Follow these steps to enable the Ribbon (XML) item:
@@ -37,10 +39,12 @@ namespace AzureDevopsPlugin
     [ComVisible(true)]
     public class Ribbon : Office.IRibbonExtensibility
     {
+        public ICommand SaveCommand { get; private set; }
         private Office.IRibbonUI ribbon;
         private bool _createWorkItemButtonEnabled = true;
         private readonly SynchronizationContext synchronizationContext;
         private IList<string> _pickListValues = new List<string>();
+        private Explorer _explorer;
 
         public Ribbon()
         {
@@ -49,6 +53,7 @@ namespace AzureDevopsPlugin
                 SynchronizationContext.SetSynchronizationContext(new WindowsFormsSynchronizationContext());
             }
             synchronizationContext = SynchronizationContext.Current;
+
         }
 
         public void EditSettings(Office.IRibbonControl control)
@@ -77,41 +82,35 @@ namespace AzureDevopsPlugin
             return _createWorkItemButtonEnabled;
         }
 
-        public async void CreateWorkItem(Office.IRibbonControl control)
+        public async Task CreateWorkItem(Office.IRibbonControl control)
         {
             Globals.ThisAddIn.ChangeTaskPaneVisibility(false);
             // Determine subject of selected item
-            Explorer explorer = Globals.ThisAddIn.Application.ActiveExplorer();
-            if (explorer != null && explorer.Selection != null && explorer.Selection.Count > 0)
+            if (_explorer?.Selection?.Count > 0)
             {
-                var mailItem = explorer.Selection[1] as MailItem;
+                var mailItem = _explorer.Selection[1] as MailItem;
                 if (mailItem == null)
                 {
                     return;
                 }
-
                 _createWorkItemButtonEnabled = false;
                 ribbon.InvalidateControl("CreateWorkItem");
-                Task.Run(async () =>
+                try
                 {
                     if (Settings.settings.CategoryCustomFieldValues != null || await Utility.ValidateVssSettings())
                     {
-                        try
-                        {
-                            var workItems = Utility.FindWorkItemsByTitle(Utility.RemoveSubjectAbbreviationsFromSubject(mailItem.Subject)).Result;
-                            synchronizationContext.Send(new SendOrPostCallback(o => Globals.ThisAddIn.FillTaskPane(workItems, mailItem)), null);
-                        }
-                        catch (System.Exception ex)
-                        {
-                            MessageBox.Show(Utility.ProcessException(ex), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        }
-                        finally
-                        {
-                            synchronizationContext.Send(new SendOrPostCallback(o => EnableCreateNewWorkItemButton()), null);
-                        }
+                        var workItems = await Utility.FindWorkItemsByTitle(Utility.RemoveSubjectAbbreviationsFromSubject(mailItem.Subject));
+                        synchronizationContext.Send(new SendOrPostCallback(o => Globals.ThisAddIn.FillTaskPane(workItems, mailItem)), null);
                     }
-                });
-
+                }
+                catch (System.Exception ex)
+                {
+                    MessageBox.Show(Utility.ProcessException(ex), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                finally
+                {
+                    synchronizationContext.Send(new SendOrPostCallback(o => EnableCreateNewWorkItemButton()), null);
+                }
             }
         }
 
@@ -142,6 +141,7 @@ namespace AzureDevopsPlugin
         public void Ribbon_Load(Office.IRibbonUI ribbonUI)
         {
             this.ribbon = ribbonUI;
+            _explorer = Globals.ThisAddIn.Application.ActiveExplorer();
         }
 
         #endregion

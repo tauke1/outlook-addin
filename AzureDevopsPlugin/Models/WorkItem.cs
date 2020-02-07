@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -9,15 +10,7 @@ namespace AzureDevopsPlugin.Models
 {
     public class WorkItem
     {
-        static Dictionary<string, Color> StatesWithColors = new Dictionary<string, System.Drawing.Color>
-        {
-            { "new", Color.FromArgb(173,172,174) },
-            { "in progress", Color.FromArgb(40,102,148) },
-            { "under monitoring", Color.FromArgb(143,170,161) },
-            { "on hold", Color.FromArgb(238,237,86) },
-            { "resolved", Color.FromArgb(161,185,103) },
-            { "closed", Color.FromArgb(84,140,79) }
-        };
+        static Dictionary<string, KeyValuePair<string, Color>> States = new Dictionary<string, KeyValuePair<string,Color>>();
 
         public int Id { get; set; }
 
@@ -28,12 +21,30 @@ namespace AzureDevopsPlugin.Models
         public string Url { get; set; }
         public Color StateColor { get {
                 var stateLower = State != null ? State.ToLower() : string.Empty;
-                return StatesWithColors.ContainsKey(stateLower) ? StatesWithColors[stateLower] : Color.White;
+                return States.ContainsKey(stateLower) ? States[stateLower].Value : Color.White;
             }
         }
         public override string ToString()
         {
             return Id + " " + Title;
+        }
+
+        public static void SetStates(List<WorkItemStateColor> stateColors)
+        {
+            States.Clear();
+            var colorConverter = new ColorConverter();
+            if (stateColors?.Count > 0)
+            {
+                foreach (var state in stateColors)
+                {
+                    States[state.Name.ToLower()] = new KeyValuePair<string, Color>(state.Name, (Color)colorConverter.ConvertFromString("#" + state.Color));
+                }
+            }
+        }
+
+        public static Dictionary<string, KeyValuePair<string, Color>> GetStates()
+        {
+            return States;
         }
     }
 }
