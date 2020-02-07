@@ -30,27 +30,27 @@ namespace AzureDevopsPlugin
         /// Get TFS client
         /// </summary>
         /// <returns></returns>
-        public static T GetTFSHttpClient<T>() where T : VssHttpClientBase
+        public async static Task<T> GetTFSHttpClient<T>() where T : VssHttpClientBase
         {
             var valid = Settings.settings.Validate();
             if (valid)
             {
-                return GetTFSHttpClient<T>(Settings.settings.OrgName, Settings.settings.PatToken);
+                return await GetTFSHttpClient<T>(Settings.settings.OrgName, Settings.settings.PatToken);
             }
             return null;
         }
 
-        public static T GetTFSHttpClient<T>(string orgName, string PatToken) where T : VssHttpClientBase
+        public async static Task<T> GetTFSHttpClient<T>(string orgName, string PatToken) where T : VssHttpClientBase
         {
             var u = new Uri($"https://dev.azure.com/" + orgName);
             VssCredentials c = new VssCredentials(new VssBasicCredential(string.Empty, PatToken));
             var connection = new VssConnection(u, c);
-            return connection.GetClient<T>();
+            return await connection.GetClientAsync<T>();
         }
 
         public async static Task GetStates(string workItemType)
         {
-            var workitemClient = GetTFSHttpClient<WorkItemTrackingHttpClient>();
+            var workitemClient = await GetTFSHttpClient<WorkItemTrackingHttpClient>();
             var states = await workitemClient.GetWorkItemTypeStatesAsync(Settings.settings.ProjectName, workItemType, GetCancellationToken(20));
             var b = 1 + 1;
         }
@@ -62,7 +62,7 @@ namespace AzureDevopsPlugin
         /// <returns></returns>
         public async static Task<AttachmentReference> CreateAttachment(string filePath)
         {
-            var workitemClient = GetTFSHttpClient<WorkItemTrackingHttpClient>();
+            var workitemClient = await GetTFSHttpClient<WorkItemTrackingHttpClient>();
             if (workitemClient != null)
             {
                 using (FileStream attStream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
@@ -87,7 +87,7 @@ namespace AzureDevopsPlugin
         /// <returns></returns>
         public async static Task<WorkItem> CreateWorkItem(string title, string description, string category, Attachments attachments = null, bool withAttachments = false)
         {
-            var workitemClient = GetTFSHttpClient<WorkItemTrackingHttpClient>();
+            var workitemClient = await GetTFSHttpClient<WorkItemTrackingHttpClient>();
             if (workitemClient != null)
             {
                 var document = new JsonPatchDocument();
@@ -164,7 +164,7 @@ namespace AzureDevopsPlugin
         /// <returns></returns>
         public async static Task<Comment> AddCommentToWorkItem(int workItemId, string state , string comment, Attachments attachments = null, bool withAttachments = false)
         {
-            var workItemsClient = GetTFSHttpClient<WorkItemTrackingHttpClient>();
+            var workItemsClient = await GetTFSHttpClient<WorkItemTrackingHttpClient>();
             if (workItemsClient != null)
             {
                 var workItem = await workItemsClient.GetWorkItemAsync(workItemId, cancellationToken: GetCancellationToken(20));
@@ -206,7 +206,7 @@ namespace AzureDevopsPlugin
         /// <returns></returns>
         public static async Task<List<Models.WorkItem>> FindWorkItemsByTitle(string title)
         {
-            var workitemClient = GetTFSHttpClient<WorkItemTrackingHttpClient>();
+            var workitemClient = await GetTFSHttpClient<WorkItemTrackingHttpClient>();
             if (workitemClient != null)
             {
                 var list = new List<Models.WorkItem>();
@@ -246,8 +246,8 @@ namespace AzureDevopsPlugin
 
         public async static Task<IList<string>> GetCustomFieldPickListValue(string fieldName)
         {
-            var witClient = GetTFSHttpClient<WorkItemTrackingHttpClient>();
-            var witTrackingClient = GetTFSHttpClient<WorkItemTrackingProcessHttpClient>();
+            var witClient = await GetTFSHttpClient<WorkItemTrackingHttpClient>();
+            var witTrackingClient = await GetTFSHttpClient<WorkItemTrackingProcessHttpClient>();
             return await GetCustomFieldPickListValue(fieldName, witClient, witTrackingClient);
         }
 
@@ -300,8 +300,8 @@ namespace AzureDevopsPlugin
                 throw new ArgumentNullException("bad arguments");
             }
 
-            var witClient = GetTFSHttpClient<WorkItemTrackingHttpClient>(orgName,patToken);
-            var witProcessClient = GetTFSHttpClient<WorkItemTrackingProcessHttpClient>(orgName, patToken);
+            var witClient = await GetTFSHttpClient<WorkItemTrackingHttpClient>(orgName,patToken);
+            var witProcessClient = await GetTFSHttpClient<WorkItemTrackingProcessHttpClient>(orgName, patToken);
             var type = await witClient.GetWorkItemTypeAsync(projectName, workItemType, cancellationToken: GetCancellationToken(20));
             var customFieldValues = await GetCustomFieldPickListValue(customCategoryField, witClient, witProcessClient);
             var states = await witClient.GetWorkItemTypeStatesAsync(projectName, workItemType, GetCancellationToken(20));
