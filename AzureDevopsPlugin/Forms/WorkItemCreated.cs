@@ -33,6 +33,7 @@ namespace AzureDevopsPlugin.Forms
                 {
                 }
             }
+            this.Close();
         }
 
         private void okButton_Click(object sender, EventArgs e)
