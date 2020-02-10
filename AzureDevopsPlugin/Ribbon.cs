@@ -1,4 +1,5 @@
 ﻿using AzureDevopsPlugin.Forms;
+using AzureDevopsPlugin.Utilities;
 using Microsoft.Office.Interop.Outlook;
 using System;
 using System.Collections.Generic;
@@ -73,7 +74,7 @@ namespace AzureDevopsPlugin
             }
             catch (System.Exception ex)
             {
-                Utility.ProcessException(ex);
+                TfsUtility.ProcessException(ex);
             }
         }
 
@@ -97,15 +98,15 @@ namespace AzureDevopsPlugin
                 ribbon.InvalidateControl("CreateWorkItem");
                 try
                 {
-                    if (Settings.settings.CategoryCustomFieldValues != null || await Utility.ValidateVssSettings())
+                    if ((Models.WorkItem.CategoriesBySource?.Count > 0 && Models.WorkItem.CategoriesByComplexity?.Count > 0) || await TfsUtility.ValidateVssSettings())
                     {
-                        var workItems = await Utility.FindWorkItemsByTitle(Utility.RemoveSubjectAbbreviationsFromSubject(mailItem.Subject));
+                        var workItems = await TfsUtility.FindWorkItemsByTitle(HtmlUtility.RemoveSubjectAbbreviationsFromSubject(mailItem.Subject));
                         synchronizationContext.Send(new SendOrPostCallback(o => Globals.ThisAddIn.FillTaskPane(workItems, mailItem)), null);
                     }
                 }
                 catch (System.Exception ex)
                 {
-                    MessageBox.Show(Utility.ProcessException(ex), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show(TfsUtility.ProcessException(ex), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
                 finally
                 {

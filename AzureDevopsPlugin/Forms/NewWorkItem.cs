@@ -1,4 +1,5 @@
-﻿using Microsoft.Office.Interop.Outlook;
+﻿using AzureDevopsPlugin.Utilities;
+using Microsoft.Office.Interop.Outlook;
 using Microsoft.TeamFoundation.ProcessConfiguration.Client;
 using Microsoft.TeamFoundation.WorkItemTracking.Client;
 using System;
@@ -31,13 +32,13 @@ namespace AzureDevopsPlugin.Forms
             _outlookItem = outlookItem;
             InitializeComponent();
             ResetFields();
-            if (Settings.settings.CategoryCustomFieldValues?.Count > 0)
+            if (Models.WorkItem.CategoriesBySource?.Count > 0)
             {
                 var selectedIndex = 0;
                 var i = 0;
-                foreach (var value in Settings.settings.CategoryCustomFieldValues)
+                foreach (var value in Models.WorkItem.CategoriesBySource)
                 {
-                    if (value == Settings.settings.CategoryCustomFieldDefaultValue)
+                    if (value == Settings.settings.CategoryBySourceDefaultValue)
                     {
                         selectedIndex = i; 
                     }
@@ -59,13 +60,13 @@ namespace AzureDevopsPlugin.Forms
             {
                 categoriesComboBox.Items.Clear();
                 categoriesComboBox.SelectedItem = null;
-                if (Settings.settings.CategoryCustomFieldValues?.Count > 0)
+                if (Models.WorkItem.CategoriesByComplexity?.Count > 0)
                 {
                     var selectedIndex = 0;
                     var i = 0;
-                    foreach (var item in Settings.settings.CategoryCustomFieldValues)
+                    foreach (var item in Models.WorkItem.CategoriesByComplexity)
                     {
-                        if (item == Settings.settings.CategoryCustomFieldDefaultValue)
+                        if (item == Settings.settings.CategoryBySourceDefaultValue)
                         {
                             selectedIndex = i;
                         }
@@ -123,7 +124,7 @@ namespace AzureDevopsPlugin.Forms
                     var title = titleTextBox.Text;
                     var description = descriptionTextBox.DocumentText;
                     var withAttachments = includeAttachmentsCheckBox.Checked;
-                    var createdWorkItem = await Utility.CreateWorkItem(title, description, category, _outlookItem.Attachments, withAttachments);
+                    var createdWorkItem = await TfsUtility.CreateWorkItem(title, description, category, _outlookItem.Attachments, withAttachments);
                     _syncContext.Send(new SendOrPostCallback((state) => {
                         var workItemCreatedForm = new WorkItemCreated(createdWorkItem.Id.Value);
                         workItemCreatedForm.StartPosition = FormStartPosition.CenterParent;
@@ -133,7 +134,7 @@ namespace AzureDevopsPlugin.Forms
                 }
                 catch (System.Exception ex)
                 {
-                    _syncContext.Send(new SendOrPostCallback((state) => MessageBox.Show(Utility.ProcessException(ex), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)),null);
+                    _syncContext.Send(new SendOrPostCallback((state) => MessageBox.Show(TfsUtility.ProcessException(ex), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)),null);
                 }
                 finally
                 {
@@ -153,8 +154,8 @@ namespace AzureDevopsPlugin.Forms
 
         private void ResetFields()
         {
-            titleTextBox.Text = Utility.RemoveSubjectAbbreviationsFromSubject(_outlookItem.Subject);
-            descriptionTextBox.Html = Utility.GetLastMessageFromMessageHTMLBody(_outlookItem.HTMLBody);
+            titleTextBox.Text = HtmlUtility.RemoveSubjectAbbreviationsFromSubject(_outlookItem.Subject);
+            descriptionTextBox.Html = HtmlUtility.GetLastMessageFromMessageHTMLBody(_outlookItem.HTMLBody);
         }
         private void setOriginalBodyBtn_Click(object sender, EventArgs e)
         {
@@ -163,7 +164,7 @@ namespace AzureDevopsPlugin.Forms
 
         private void removeStylesButton_Click(object sender, EventArgs e)
         {
-            descriptionTextBox.Html = Utility.ClearFormattingOfHtml(descriptionTextBox.DocumentText);
+            descriptionTextBox.Html = HtmlUtility.ClearFormattingOfHtml(descriptionTextBox.DocumentText);
         }
     }
 }

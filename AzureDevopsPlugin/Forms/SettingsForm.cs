@@ -1,4 +1,5 @@
-﻿using Microsoft.TeamFoundation.WorkItemTracking.Process.WebApi;
+﻿using AzureDevopsPlugin.Utilities;
+using Microsoft.TeamFoundation.WorkItemTracking.Process.WebApi;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
 using Microsoft.VisualStudio.Services.Common;
 using System;
@@ -23,7 +24,8 @@ namespace AzureDevopsPlugin.Forms
             orgNameTextBox.Text = Settings.settings.OrgName;
             projectNameTextBox.Text = Settings.settings.ProjectName;
             patTokenTextBox.Text = Settings.settings.PatToken;
-            customCategoryFieldTextBox.Text = Settings.settings.CategoryCustomFieldName;
+            categoryBySourceFieldTextBox.Text = Settings.settings.CategoryBySourceField;
+            categoryByComplexityTextBox.Text = Settings.settings.CategoryByComplexityField;
             workItemTypeTextBox.Text = Settings.settings.WorkItemType;
             if (SynchronizationContext.Current == null)
             {
@@ -52,24 +54,25 @@ namespace AzureDevopsPlugin.Forms
 
         private void FillCategoriesComboBox()
         {
-            defaultCategoryComboBox.Items.Clear();
-            if (Settings.settings.CategoryCustomFieldValues?.Count > 0)
+            defaultCategoryBySourceComboBox.Items.Clear();
+            if (Models.WorkItem.CategoriesBySource?.Count > 0)
+
             {
                 var categoryCustomFieldDefaultValueFoundIndex = 0;
                 var i = 0;
-                foreach (var cat in Settings.settings.CategoryCustomFieldValues)
+                foreach (var cat in Models.WorkItem.CategoriesBySource)
                 {
-                    defaultCategoryComboBox.Items.Add(cat);
-                    if (cat == Settings.settings.CategoryCustomFieldDefaultValue)
+                    defaultCategoryBySourceComboBox.Items.Add(cat);
+                    if (cat == Settings.settings.CategoryBySourceDefaultValue)
                     {
                         categoryCustomFieldDefaultValueFoundIndex = i;
                     }
                     i++;
                 }
 
-                defaultCategoryComboBox.SelectedIndex = categoryCustomFieldDefaultValueFoundIndex;
+                defaultCategoryBySourceComboBox.SelectedIndex = categoryCustomFieldDefaultValueFoundIndex;
 
-                defaultCategoryComboBox.Enabled = true;
+                defaultCategoryBySourceComboBox.Enabled = true;
             }
         }
 
@@ -78,7 +81,8 @@ namespace AzureDevopsPlugin.Forms
             var orgName = orgNameTextBox.Text != null ? orgNameTextBox.Text.Trim() : null;
             var projectName = projectNameTextBox.Text != null ? projectNameTextBox.Text.Trim() : null;
             var patToken = patTokenTextBox.Text != null ? patTokenTextBox.Text.Trim() : null;
-            var customCategoryField = customCategoryFieldTextBox.Text != null ? customCategoryFieldTextBox.Text.Trim() : null;
+            var categoryBySource = categoryBySourceFieldTextBox.Text != null ? categoryBySourceFieldTextBox.Text.Trim() : null;
+            var categoryByComplexity = categoryByComplexityTextBox.Text != null ? categoryByComplexityTextBox.Text.Trim() : null;
             var workItemType = workItemTypeTextBox.Text != null ? workItemTypeTextBox.Text.Trim() : null;
             var errorMessage = "";
             if (string.IsNullOrEmpty(orgName))
@@ -96,16 +100,20 @@ namespace AzureDevopsPlugin.Forms
                 errorMessage += "PAT token field is empty\n";
             }
 
-            if (string.IsNullOrEmpty(customCategoryField))
-            {
-                errorMessage += "customCategoryField token field is empty\n";
-            }
-
             if (string.IsNullOrEmpty(workItemTypeTextBox.Text))
             {
                 errorMessage += "work Item type field is empty\n";
             }
 
+            if (string.IsNullOrEmpty(categoryBySource))
+            {
+                errorMessage += "categoryBySource field is empty\n";
+            }
+
+            if (string.IsNullOrEmpty(categoryByComplexity))
+            {
+                errorMessage += "categoryByComplexity field is empty\n";
+            }
 
             if (showMessage && !string.IsNullOrEmpty(errorMessage))
             {
@@ -115,14 +123,14 @@ namespace AzureDevopsPlugin.Forms
             {
                 try
                 {
-                    await Utility.ValidateVssSettings(workItemType, projectName, customCategoryField, orgName, patToken);
+                    await TfsUtility.ValidateVssSettings(workItemType, projectName, categoryBySource, categoryByComplexity, orgName, patToken);
                     return true;
                 }
                 catch (System.Exception ex)
                 {
                     if (showMessage)
                     {
-                        MessageBox.Show(Utility.ProcessException(ex), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show(TfsUtility.ProcessException(ex), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
             }
@@ -146,29 +154,32 @@ namespace AzureDevopsPlugin.Forms
                 var orgName = orgNameTextBox.Text != null ? orgNameTextBox.Text.Trim() : null;
                 var projectName = projectNameTextBox.Text != null ? projectNameTextBox.Text.Trim() : null;
                 var patToken = patTokenTextBox.Text != null ? patTokenTextBox.Text.Trim() : null;
-                var customCategoryField = customCategoryFieldTextBox.Text != null ? customCategoryFieldTextBox.Text.Trim() : null;
+                var categoryBySourceField = categoryBySourceFieldTextBox.Text != null ? categoryBySourceFieldTextBox.Text.Trim() : null;
+                var categoryByComplexityField = categoryByComplexityTextBox.Text != null ? categoryByComplexityTextBox.Text.Trim() : null;
                 var workItemType = workItemTypeTextBox.Text != null ? workItemTypeTextBox.Text.Trim() : null;
 
                 if (await Validate())
                 {
-                    string customDefaultCategory = null;
-                    if (defaultCategoryComboBox.SelectedItem != null)
+                    string categoryBySourceDefaultValue = null;
+                    if (defaultCategoryBySourceComboBox.SelectedItem != null)
                     {
-                        foreach (var cat in Settings.settings.CategoryCustomFieldValues)
+                        foreach (var cat in Models.WorkItem.CategoriesBySource)
                         {
-                            if (cat == (string)defaultCategoryComboBox.SelectedItem)
+                            if (cat == (string)defaultCategoryBySourceComboBox.SelectedItem)
                             {
-                                customDefaultCategory = cat;
+                                categoryBySourceDefaultValue = cat;
+                                break;
                             }
                         }
                     }
 
-                    Settings.settings.CategoryCustomFieldName = customCategoryField;
+                    Settings.settings.CategoryBySourceField = categoryBySourceField;
+                    Settings.settings.CategoryByComplexityField = categoryByComplexityField;
                     Settings.settings.OrgName = orgName;
                     Settings.settings.ProjectName = projectName;
                     Settings.settings.PatToken = patToken;
                     Settings.settings.WorkItemType = workItemType;
-                    Settings.settings.CategoryCustomFieldDefaultValue = customDefaultCategory;
+                    Settings.settings.CategoryBySourceDefaultValue = categoryBySourceDefaultValue;
                     Settings.settings.Save();
                     _syncContext.Send(new SendOrPostCallback((state) =>
                     {

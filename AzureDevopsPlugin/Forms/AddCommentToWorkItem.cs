@@ -1,4 +1,5 @@
-﻿using Microsoft.Office.Interop.Outlook;
+﻿using AzureDevopsPlugin.Utilities;
+using Microsoft.Office.Interop.Outlook;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -17,12 +18,14 @@ namespace AzureDevopsPlugin.Forms
         private readonly MailItem _mailItem;
         private readonly Models.WorkItem _workItem;
         private readonly SynchronizationContext _syncContext;
+        private bool _resolvedStateChosen;
         public AddCommentToWorkItem(MailItem mailItem, Models.WorkItem workItem)
         {
             if (workItem == null)
             {
                 throw new ArgumentNullException("workItems property is empty");
             }
+
             if (mailItem == null)
             {
                 throw new ArgumentNullException("mailItem property is required");
@@ -31,7 +34,7 @@ namespace AzureDevopsPlugin.Forms
             _workItem = workItem;
             _mailItem = mailItem;
             InitializeComponent();
-            commentTextBox.Html = Utility.RemoveHeaderFromHtml(Utility.GetLastMessageFromMessageHTMLBody(mailItem.HTMLBody));
+            commentTextBox.Html = HtmlUtility.RemoveHeaderFromHtml(HtmlUtility.GetLastMessageFromMessageHTMLBody(mailItem.HTMLBody));
             workItemTextBox.Text = workItem.ToString();
             workItemTextBox.Enabled = false;
             if (SynchronizationContext.Current == null)
@@ -40,6 +43,7 @@ namespace AzureDevopsPlugin.Forms
             }
 
             _syncContext = SynchronizationContext.Current;
+            FillComplexityComboBox();
             FillStatesComboBox();
         }
 
@@ -49,7 +53,7 @@ namespace AzureDevopsPlugin.Forms
             statesComboBox.SelectedItem = null;
             var i = 0;
             var currentStatusIndex = -1;
-            foreach (var state in Models.WorkItem.GetStates())
+            foreach (var state in Models.WorkItem.States)
             {
                 if (_workItem.State.ToLower() == state.Key)
                 {
@@ -65,6 +69,57 @@ namespace AzureDevopsPlugin.Forms
             statesComboBox.SelectedIndex = currentStatusIndex;
         }
 
+        private void FillComplexityComboBox()
+        {
+            complexityComboBox.Items.Clear();
+            complexityComboBox.SelectedItem = null;
+            int i = 0;
+            if (Models.WorkItem.CategoriesByComplexity?.Count > 0)
+            {
+                var selectedIndex = 0;
+                foreach (var complexity in Models.WorkItem.CategoriesByComplexity)
+                {
+                    if (complexity == _workItem.Complexity)
+                    { 
+                        selectedIndex = i;                    
+                    }
+                    complexityComboBox.Items.Add(complexity);
+                    i++;
+                }
+
+                if (_workItem.Complexity != null)
+                {
+                    complexityComboBox.SelectedIndex = selectedIndex;
+                }
+                else if (_workItem.State.ToLower() == "resolved")
+                {
+                    complexityComboBox.SelectedIndex = 0;
+                }
+            }
+        }
+
+        private void ProcessState(string state)
+        {
+            if (state.ToLower() == "resolved")
+            {
+                if (complexityComboBox.Items.Count > 0 && _workItem.Complexity == null)
+                {
+                    complexityComboBox.SelectedIndex = 0;
+                }
+                complexityComboBox.Enabled = true;
+                _resolvedStateChosen = true;
+            }
+            else
+            {
+                complexityComboBox.Enabled = false;
+                if(_workItem.Complexity == null)
+                {
+                    complexityComboBox.SelectedItem = null;
+                }
+                _resolvedStateChosen = false;
+            }
+        }
+
         private bool ValidateCommentFields()
         {
             var errorMessage = "";
@@ -76,6 +131,11 @@ namespace AzureDevopsPlugin.Forms
             if (statesComboBox.SelectedItem == null)
             {
                 errorMessage += "field State is empty";
+            }
+
+            if (_resolvedStateChosen && complexityComboBox.SelectedItem == null)
+            {
+                errorMessage += "field complexity is empty";
             }
 
             if (!string.IsNullOrEmpty(errorMessage))
@@ -104,14 +164,15 @@ namespace AzureDevopsPlugin.Forms
                 try
                 {
                     _syncContext.Send(new SendOrPostCallback((state) => ChangeEnabledStateOfControls(false)), null);
+                    var complexity = complexityComboBox.Enabled ? (string)complexityComboBox.SelectedItem : null;
                     var comment = commentTextBox.DocumentText;
                     var withAttachments = includeAttachmentsCheckBox.Checked;
-                    var commentEntity = await Utility.AddCommentToWorkItem(_workItem.Id, (string)statesComboBox.SelectedItem, comment, _mailItem.Attachments, withAttachments);
+                    var commentEntity = await TfsUtility.AddCommentToWorkItem(_workItem.Id, (string)statesComboBox.SelectedItem, comment, _mailItem.Attachments, withAttachments, complexity);
                     _syncContext.Send(new SendOrPostCallback((state) => this.Close()), null);
                 }
                 catch (System.Exception ex)
                 {
-                    MessageBox.Show(Utility.ProcessException(ex), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show(TfsUtility.ProcessException(ex), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
                 finally
                 {
@@ -128,17 +189,27 @@ namespace AzureDevopsPlugin.Forms
 
         private void useOriginalMessageBodyBtn_Click(object sender, EventArgs e)
         {
-            commentTextBox.Html = Utility.RemoveHeaderFromHtml(_mailItem.HTMLBody);
+            commentTextBox.Html = HtmlUtility.RemoveHeaderFromHtml(_mailItem.HTMLBody);
         }
 
         private void removeStylesButton_Click(object sender, EventArgs e)
         {
-            commentTextBox.Html = Utility.RemoveHeaderFromHtml(Utility.ClearFormattingOfHtml(commentTextBox.DocumentText));
+            commentTextBox.Html = HtmlUtility.RemoveHeaderFromHtml(HtmlUtility.ClearFormattingOfHtml(commentTextBox.DocumentText));
         }
 
         private void resetButton_Click(object sender, EventArgs e)
         {
-            commentTextBox.Html = Utility.RemoveHeaderFromHtml(Utility.GetLastMessageFromMessageHTMLBody(_mailItem.HTMLBody));
+            commentTextBox.Html = HtmlUtility.RemoveHeaderFromHtml(HtmlUtility.GetLastMessageFromMessageHTMLBody(_mailItem.HTMLBody));
+            FillStatesComboBox();
+        }
+
+        private void statesComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (statesComboBox.SelectedItem != null)
+            {
+                var selected = (string)statesComboBox.SelectedItem;
+                ProcessState(selected);
+            }
         }
     }
 }

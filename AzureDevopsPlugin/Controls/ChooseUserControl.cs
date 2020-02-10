@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using Microsoft.Office.Interop.Outlook;
 using AzureDevopsPlugin.Forms;
 using System.Drawing.Drawing2D;
+using AzureDevopsPlugin.Utilities;
 
 namespace AzureDevopsPlugin.Controls
 {

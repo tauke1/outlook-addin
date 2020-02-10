@@ -458,7 +458,9 @@
     <Compile Include="TextControl\TextInsertForm.designer.cs">
       <DependentUpon>TextInsertForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Utility.cs" />
+    <Compile Include="Utilities\TfsUtility.cs" />
+    <Compile Include="Utilities\HtmlUtility.cs" />
+    <Compile Include="Utilities\Utility.cs" />
     <EmbeddedResource Include="Forms\AddCommentToWorkItem.resx">
       <DependentUpon>AddCommentToWorkItem.cs</DependentUpon>
     </EmbeddedResource>

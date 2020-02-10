@@ -1,5 +1,4 @@
-﻿using HtmlAgilityPack;
-using Microsoft.Office.Interop.Outlook;
+﻿using Microsoft.Office.Interop.Outlook;
 using Microsoft.TeamFoundation.WorkItemTracking.Process.WebApi;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
@@ -7,11 +6,8 @@ using Microsoft.VisualStudio.Services.Common;
 using Microsoft.VisualStudio.Services.WebApi;
 using Microsoft.VisualStudio.Services.WebApi.Patch;
 using Microsoft.VisualStudio.Services.WebApi.Patch.Json;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -19,17 +15,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace AzureDevopsPlugin
+namespace AzureDevopsPlugin.Utilities
 {
-    /// <summary>
-    /// Utility which contains helper functions
-    /// </summary>
-    public class Utility
+    public class TfsUtility
     {
-        /// <summary>
-        /// Get TFS client
-        /// </summary>
-        /// <returns></returns>
         public async static Task<T> GetTFSHttpClient<T>() where T : VssHttpClientBase
         {
             var valid = Settings.settings.Validate();
@@ -45,14 +34,8 @@ namespace AzureDevopsPlugin
             var u = new Uri($"https://dev.azure.com/" + orgName);
             VssCredentials c = new VssCredentials(new VssBasicCredential(string.Empty, PatToken));
             var connection = new VssConnection(u, c);
+            await connection.ConnectAsync();
             return await connection.GetClientAsync<T>();
-        }
-
-        public async static Task GetStates(string workItemType)
-        {
-            var workitemClient = await GetTFSHttpClient<WorkItemTrackingHttpClient>();
-            var states = await workitemClient.GetWorkItemTypeStatesAsync(Settings.settings.ProjectName, workItemType, GetCancellationToken(20));
-            var b = 1 + 1;
         }
 
         /// <summary>
@@ -129,7 +112,7 @@ namespace AzureDevopsPlugin
                 document.Add(
                 new JsonPatchOperation()
                 {
-                    Path = "/fields/Custom." + Settings.settings.CategoryCustomFieldName,
+                    Path = "/fields/Custom." + Settings.settings.CategoryBySourceField,
                     Operation = Operation.Add,
                     Value = category
                 });
@@ -162,7 +145,7 @@ namespace AzureDevopsPlugin
         /// <param name="attachments">attachments</param>
         /// <param name="withAttachments">include attachments flag</param>
         /// <returns></returns>
-        public async static Task<Comment> AddCommentToWorkItem(int workItemId, string state , string comment, Attachments attachments = null, bool withAttachments = false)
+        public async static Task<Comment> AddCommentToWorkItem(int workItemId, string state, string comment, Attachments attachments = null, bool withAttachments = false, string complexity = null)
         {
             var workItemsClient = await GetTFSHttpClient<WorkItemTrackingHttpClient>();
             if (workItemsClient != null)
@@ -182,6 +165,17 @@ namespace AzureDevopsPlugin
                         File.Delete(savePath);
                         i++;
                     }
+                }
+
+                if (!string.IsNullOrEmpty(complexity))
+                {
+                    updateDocument.Add(
+                    new JsonPatchOperation()
+                    {
+                        Path = "/fields/Custom." + Settings.settings.CategoryByComplexityField,
+                        Operation = Operation.Replace,
+                        Value = complexity
+                    });
                 }
                 // updating state
                 updateDocument.Add(
@@ -223,10 +217,11 @@ namespace AzureDevopsPlugin
                         "Order By [State] Asc, [Changed Date] Desc",
                 };
 
+                var complexityField = "Custom." + Settings.settings.CategoryByComplexityField;
                 var result = await workitemClient.QueryByWiqlAsync(wiql);
                 if (result.WorkItems.Count() > 0)
                 {
-                    var workItems = await workitemClient.GetWorkItemsAsync(result.WorkItems.Select(a => a.Id), new List<string> { "System.State", "System.Title" }, cancellationToken: GetCancellationToken(20));
+                    var workItems = await workitemClient.GetWorkItemsAsync(result.WorkItems.Select(a => a.Id), new List<string> { "System.State", "System.Title", complexityField }, cancellationToken: GetCancellationToken(20));
                     foreach (var workItem in workItems)
                     {
                         if (!workItem.Id.HasValue)
@@ -234,7 +229,7 @@ namespace AzureDevopsPlugin
                             continue;
                         }
 
-                        list.Add(new Models.WorkItem { Id = workItem.Id.Value, Title = (string)workItem.Fields["System.Title"], State = (string)workItem.Fields["System.State"], Url = workItem.Url });
+                        list.Add(new Models.WorkItem { Id = workItem.Id.Value, Title = (string)workItem.Fields["System.Title"], State = (string)workItem.Fields["System.State"], Complexity = workItem.Fields.ContainsKey(complexityField) ? (string)workItem.Fields[complexityField] : null });
                     }
                 }
 
@@ -283,7 +278,7 @@ namespace AzureDevopsPlugin
                 {
                     return false;
                 }
-                await ValidateVssSettings(Settings.settings.WorkItemType, Settings.settings.ProjectName, Settings.settings.CategoryCustomFieldName, Settings.settings.OrgName, Settings.settings.PatToken);
+                await ValidateVssSettings(Settings.settings.WorkItemType, Settings.settings.ProjectName, Settings.settings.CategoryBySourceField, Settings.settings.CategoryByComplexityField, Settings.settings.OrgName, Settings.settings.PatToken);
                 return true;
             }
             catch (System.Exception ex)
@@ -293,127 +288,25 @@ namespace AzureDevopsPlugin
             return false;
         }
 
-        public async static Task ValidateVssSettings(string workItemType, string projectName, string customCategoryField, string orgName, string patToken)
+        public async static Task ValidateVssSettings(string workItemType, string projectName, string categoryBySourceField, string categoryByComplexityField, string orgName, string patToken)
         {
-            if (string.IsNullOrEmpty(workItemType) || string.IsNullOrEmpty(projectName) || string.IsNullOrEmpty(customCategoryField) || string.IsNullOrEmpty(orgName) || string.IsNullOrEmpty(patToken))
+            if (string.IsNullOrEmpty(workItemType) || string.IsNullOrEmpty(projectName) || string.IsNullOrEmpty(categoryBySourceField) || string.IsNullOrEmpty(orgName) || string.IsNullOrEmpty(patToken))
             {
                 throw new ArgumentNullException("bad arguments");
             }
 
-            var witClient = await GetTFSHttpClient<WorkItemTrackingHttpClient>(orgName,patToken);
+            var witClient = await GetTFSHttpClient<WorkItemTrackingHttpClient>(orgName, patToken);
             var witProcessClient = await GetTFSHttpClient<WorkItemTrackingProcessHttpClient>(orgName, patToken);
             var type = await witClient.GetWorkItemTypeAsync(projectName, workItemType, cancellationToken: GetCancellationToken(20));
-            var customFieldValues = await GetCustomFieldPickListValue(customCategoryField, witClient, witProcessClient);
+            var categoriesByComplexity = await GetCustomFieldPickListValue(categoryByComplexityField, witClient, witProcessClient);
+            var categoriesBySource = await GetCustomFieldPickListValue(categoryBySourceField, witClient, witProcessClient);
             var states = await witClient.GetWorkItemTypeStatesAsync(projectName, workItemType, GetCancellationToken(20));
             Models.WorkItem.SetStates(states);
-            Settings.settings.CategoryCustomFieldValues = customFieldValues;
+            Models.WorkItem.CategoriesByComplexity = categoriesByComplexity.ToList();
+            Models.WorkItem.CategoriesBySource = categoriesBySource.ToList();
         }
 
         public static string ProcessException(System.Exception ex) => ex.InnerException != null ? ex.InnerException is VssUnauthorizedException ? "PAT token is invalid, or has not enough permissions" : ex.InnerException.Message : ex.Message;
-
-        /// <summary>
-        /// Get last reply from message
-        /// </summary>
-        /// <param name="mailItem"></param>
-        /// <returns></returns>
-        public static string GetLastMessageFromMessageHTMLBody(string html)
-        {
-            HtmlAgilityPack.HtmlDocument htmlSnippet = new HtmlAgilityPack.HtmlDocument();
-            htmlSnippet.LoadHtml(html);
-            var divsByWordSection1Class = htmlSnippet.DocumentNode.SelectNodes("//div[@class = 'WordSection1']");
-            HtmlNode headNode = null;
-            if (htmlSnippet.DocumentNode.SelectSingleNode("//head") != null)
-            {
-                headNode = htmlSnippet.DocumentNode.SelectSingleNode("//head");
-            }
-
-            // Finding messages created by outlook
-            if (divsByWordSection1Class?.Count > 0)
-            {
-                var borderSplitted = divsByWordSection1Class[0].OuterHtml.Split(new string[] { "<div style=\"border" }, StringSplitOptions.None);
-                if (borderSplitted.Length == 1)
-                {
-                    borderSplitted = borderSplitted[0].Split(new string[] { "<div style='border" }, StringSplitOptions.None);
-                    if (borderSplitted.Length == 1)
-                    {
-                        borderSplitted = borderSplitted[0].Split(new string[] { "<span id=OutlookSignature>" }, StringSplitOptions.None);
-                    }
-                }
-
-                return headNode != null ? headNode.OuterHtml + borderSplitted[0] : borderSplitted[0];
-            }
-
-            /// finding first reply for messages sent from email by dir=ltr tag
-            var divsByLtrDir = htmlSnippet.DocumentNode.SelectNodes("//div[@dir = 'ltr']");
-            if (divsByLtrDir?.Count > 0)
-            {
-                var splitted = htmlSnippet.DocumentNode.OuterHtml.Split(new string[] { divsByLtrDir[0].OuterHtml }, StringSplitOptions.None)[0];
-                return headNode != null ? headNode.OuterHtml + splitted : splitted;
-            }
-
-            return htmlSnippet.DocumentNode.OuterHtml;
-        }
-
-        public static string RemoveHeaderFromHtml(string html)
-        {
-            HtmlAgilityPack.HtmlDocument htmlSnippet = new HtmlAgilityPack.HtmlDocument();
-            htmlSnippet.LoadHtml(html);
-            if (htmlSnippet.DocumentNode.SelectSingleNode("//head") != null)
-            {
-                htmlSnippet.DocumentNode.RemoveChild(htmlSnippet.DocumentNode.SelectSingleNode("//head"));
-            }
-
-            return htmlSnippet.DocumentNode.OuterHtml;
-        }
-
-        public static string ClearFormattingOfHtml(string html)
-        {
-            HtmlAgilityPack.HtmlDocument htmlSnippet = new HtmlAgilityPack.HtmlDocument();
-            htmlSnippet.LoadHtml(html);
-            RemoveStyleAttributes(htmlSnippet);
-            var htmlElement = htmlSnippet.DocumentNode;
-            if (htmlElement.SelectSingleNode("//body") != null)
-            {
-                htmlElement = htmlElement.SelectSingleNode("//body");
-            }
-
-            return htmlElement.OuterHtml;
-        }
-
-        public static void RemoveStyleAttributes(HtmlAgilityPack.HtmlDocument html)
-        {
-            var elementsWithStyleAttribute = html.DocumentNode.SelectNodes("//@style");
-
-            if (elementsWithStyleAttribute != null)
-            {
-                foreach (var element in elementsWithStyleAttribute)
-                {
-                    element.Attributes["style"].Remove();
-                }
-            }
-        }
-
-        public static string RemoveSubjectAbbreviationsFromSubject(string subject)
-        {
-            if (subject.Length > 3)
-            {
-                var abbr = subject.Substring(0, 3);
-                if (abbr.ToLower() == "re:" || abbr.ToLower() == "fw:")
-                {
-                    return subject.Substring(3, subject.Length - 3).Trim();
-                }
-            }
-            return subject.Trim();
-        }
-
-        public static void MoveFormToCenterAndShow(Form form)
-        {
-            form.StartPosition = FormStartPosition.Manual;
-            dynamic window = Globals.ThisAddIn.Application.ActiveWindow();
-            form.Location = new Point(window.Left + ((window.Width - form.Width) / 2), window.Top + ((window.Height - form.Height) / 2));
-            form.Show();
-        }
-
         public static CancellationToken GetCancellationToken(int seconds) => (new CancellationTokenSource(TimeSpan.FromSeconds(seconds))).Token;
     }
 }

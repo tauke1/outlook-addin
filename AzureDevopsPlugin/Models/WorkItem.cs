@@ -10,13 +10,19 @@ namespace AzureDevopsPlugin.Models
 {
     public class WorkItem
     {
-        static Dictionary<string, KeyValuePair<string, Color>> States = new Dictionary<string, KeyValuePair<string,Color>>();
+        private static readonly HashSet<string> _ignoreStates = new HashSet<string> { "closed" };
+
+        public static Dictionary<string, KeyValuePair<string, Color>> States { get; set; } = new Dictionary<string, KeyValuePair<string, Color>>();
+        public static List<string> CategoriesBySource { get; set; } = new List<string>();
+        public static List<string> CategoriesByComplexity { get; set; } = new List<string>();
 
         public int Id { get; set; }
 
         public string Title { get; set; }
 
         public string State { get; set; }
+
+        public string Complexity { get; set; }
 
         public string Url { get; set; }
         public Color StateColor { get {
@@ -37,14 +43,14 @@ namespace AzureDevopsPlugin.Models
             {
                 foreach (var state in stateColors)
                 {
+                    if (_ignoreStates.Contains(state.Name.ToLower()))
+                    {
+                        continue;
+                    }
+
                     States[state.Name.ToLower()] = new KeyValuePair<string, Color>(state.Name, (Color)colorConverter.ConvertFromString("#" + state.Color));
                 }
             }
-        }
-
-        public static Dictionary<string, KeyValuePair<string, Color>> GetStates()
-        {
-            return States;
         }
     }
 }

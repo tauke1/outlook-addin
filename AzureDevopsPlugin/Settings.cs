@@ -58,15 +58,24 @@ namespace AzureDevopsPlugin
         }
 
         [UserScopedSetting()]
-        public string CategoryCustomFieldName
+        public string CategoryBySourceField
         {
-            get { return (string)this["CategoryCustomFieldName"]; }
-            set { this["CategoryCustomFieldName"] = value; }
+            get { return (string)this["CategoryBySourceField"]; }
+            set { this["CategoryBySourceField"] = value; }
         }
 
-        public IList<string> CategoryCustomFieldValues { get; set; }
+        [UserScopedSetting()]
+        public string CategoryByComplexityField
+        {
+            get { return (string)this["CategoryByComplexityField"]; }
+            set { this["CategoryByComplexityField"] = value; }
+        }
 
-        public string CategoryCustomFieldDefaultValue { get; set; }
+        [UserScopedSetting()]
+        public string CategoryBySourceDefaultValue {
+            get { return (string)this["CategoryBySourceDefaultValue"]; }
+            set { this["CategoryBySourceDefaultValue"] = value; }
+        }
 
         public string ProjectURL { get { return "https://github.com/tauke1/outlook-addin"; } }
 
@@ -93,9 +102,14 @@ namespace AzureDevopsPlugin
                 errorMessage += "please fill organization name field in settings\n";
             }
 
-            if (string.IsNullOrEmpty(this.CategoryCustomFieldName))
+            if (string.IsNullOrEmpty(this.CategoryBySourceField))
             {
-                errorMessage += "please fill category custom field in settings\n";
+                errorMessage += "please fill category by source field in settings\n";
+            }
+
+            if (string.IsNullOrEmpty(this.CategoryByComplexityField))
+            {
+                errorMessage += "please fill category by complexity field in settings\n";
             }
 
             if (!string.IsNullOrEmpty(errorMessage))
