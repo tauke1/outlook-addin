@@ -45,6 +45,8 @@ namespace AzureDevopsPlugin.Forms
             _syncContext = SynchronizationContext.Current;
             FillComplexityComboBox();
             FillStatesComboBox();
+
+            Settings.settings.SetSettingsChangedNotification(() => FillComplexityComboBox());
         }
 
         private void FillStatesComboBox()
@@ -73,10 +75,11 @@ namespace AzureDevopsPlugin.Forms
         {
             complexityComboBox.Items.Clear();
             complexityComboBox.SelectedItem = null;
+            complexityComboBox.Text = null;
             int i = 0;
             if (Models.WorkItem.CategoriesByComplexity?.Count > 0)
             {
-                var selectedIndex = 0;
+                var selectedIndex = -1;
                 foreach (var complexity in Models.WorkItem.CategoriesByComplexity)
                 {
                     if (complexity == _workItem.Complexity)
@@ -86,14 +89,16 @@ namespace AzureDevopsPlugin.Forms
                     complexityComboBox.Items.Add(complexity);
                     i++;
                 }
-
-                if (_workItem.Complexity != null)
+                if (_workItem.State.ToLower() == "resolved")
                 {
-                    complexityComboBox.SelectedIndex = selectedIndex;
+                    complexityComboBox.SelectedIndex = selectedIndex >= 0 ? selectedIndex : 0;
                 }
-                else if (_workItem.State.ToLower() == "resolved")
+                else
                 {
-                    complexityComboBox.SelectedIndex = 0;
+                    if (_workItem.Complexity != null && selectedIndex >= 0)
+                    {
+                        complexityComboBox.SelectedIndex = selectedIndex;
+                    }
                 }
             }
         }
@@ -164,7 +169,7 @@ namespace AzureDevopsPlugin.Forms
                 try
                 {
                     _syncContext.Send(new SendOrPostCallback((state) => ChangeEnabledStateOfControls(false)), null);
-                    var complexity = complexityComboBox.Enabled ? (string)complexityComboBox.SelectedItem : null;
+                    var complexity = _resolvedStateChosen ? (string)complexityComboBox.SelectedItem : null;
                     var comment = commentTextBox.DocumentText;
                     var withAttachments = includeAttachmentsCheckBox.Checked;
                     var commentEntity = await TfsUtility.AddCommentToWorkItem(_workItem.Id, (string)statesComboBox.SelectedItem, comment, _mailItem.Attachments, withAttachments, complexity);

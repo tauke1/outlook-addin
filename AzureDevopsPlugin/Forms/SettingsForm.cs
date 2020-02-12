@@ -115,6 +115,11 @@ namespace AzureDevopsPlugin.Forms
                 errorMessage += "categoryByComplexity field is empty\n";
             }
 
+            if (categoryByComplexity == categoryBySource)
+            {
+                errorMessage += "categoryByComplexity and categoryBySource should not be equal\n";
+            }
+
             if (showMessage && !string.IsNullOrEmpty(errorMessage))
             {
                 MessageBox.Show(errorMessage, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);

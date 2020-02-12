@@ -40,7 +40,7 @@ namespace AzureDevopsPlugin.Forms
                 {
                     if (value == Settings.settings.CategoryBySourceDefaultValue)
                     {
-                        selectedIndex = i; 
+                        selectedIndex = i;
                     }
                     categoriesComboBox.Items.Add(value);
                     i++;
@@ -53,8 +53,7 @@ namespace AzureDevopsPlugin.Forms
                     SynchronizationContext.SetSynchronizationContext(new WindowsFormsSynchronizationContext());
                 }
                 _syncContext = SynchronizationContext.Current;
-    }
-
+            }
 
             Settings.settings.SetSettingsChangedNotification(() =>
             {
@@ -119,26 +118,28 @@ namespace AzureDevopsPlugin.Forms
             {
                 try
                 {
-                    _syncContext.Send(new SendOrPostCallback((state) => ChangeEnabledStateOfControls(false)), null); 
+                    _syncContext.Send(new SendOrPostCallback((state) => ChangeEnabledStateOfControls(false)), null);
                     var category = categoriesComboBox.Text;
                     var title = titleTextBox.Text;
                     var description = descriptionTextBox.DocumentText;
                     var withAttachments = includeAttachmentsCheckBox.Checked;
                     var createdWorkItem = await TfsUtility.CreateWorkItem(title, description, category, _outlookItem.Attachments, withAttachments);
-                    _syncContext.Send(new SendOrPostCallback((state) => {
+                    _syncContext.Send(new SendOrPostCallback((state) =>
+                    {
                         var workItemCreatedForm = new WorkItemCreated(createdWorkItem.Id.Value);
                         workItemCreatedForm.StartPosition = FormStartPosition.CenterParent;
                         workItemCreatedForm.ShowDialog();
-                        this.Close(); 
+                        this.Close();
                     }), null);
                 }
                 catch (System.Exception ex)
                 {
-                    _syncContext.Send(new SendOrPostCallback((state) => MessageBox.Show(TfsUtility.ProcessException(ex), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)),null);
+                    _syncContext.Send(new SendOrPostCallback((state) => MessageBox.Show(TfsUtility.ProcessException(ex), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)), null);
                 }
                 finally
                 {
-                    _syncContext.Send(new SendOrPostCallback((state) => {
+                    _syncContext.Send(new SendOrPostCallback((state) =>
+                    {
                         Globals.ThisAddIn.ChangeTaskPaneVisibility(false);
                         ChangeEnabledStateOfControls(true);
                     }), null);

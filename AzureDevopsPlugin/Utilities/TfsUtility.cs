@@ -51,7 +51,7 @@ namespace AzureDevopsPlugin.Utilities
                 using (FileStream attStream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
                 {
                     var fileName = Path.GetFileName(filePath);
-                    return await workitemClient.CreateAttachmentAsync(attStream, uploadType: "simple", fileName: fileName, cancellationToken: GetCancellationToken(20)); // upload the file
+                    return await workitemClient.CreateAttachmentAsync(attStream, uploadType: "simple", fileName: fileName, cancellationToken: GetCancellationToken(30)); // upload the file
 
                 }
             }
