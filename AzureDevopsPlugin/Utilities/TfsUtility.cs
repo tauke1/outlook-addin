@@ -6,12 +6,10 @@ using Microsoft.VisualStudio.Services.Common;
 using Microsoft.VisualStudio.Services.WebApi;
 using Microsoft.VisualStudio.Services.WebApi.Patch;
 using Microsoft.VisualStudio.Services.WebApi.Patch.Json;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -241,28 +239,28 @@ namespace AzureDevopsPlugin.Utilities
 
         public async static Task<(string, IList<string>)> GetCustomFieldPickListValue(string fieldName)
         {
-            var witClient = await GetTFSHttpClient<WorkItemTrackingHttpClient>();
-            var witTrackingClient = await GetTFSHttpClient<WorkItemTrackingProcessHttpClient>();
-            return await GetCustomFieldPickListValue(fieldName, witClient, witTrackingClient);
-        }
-
-        public async static Task<(string,IList<string>)> GetCustomFieldPickListValue(string fieldName, WorkItemTrackingHttpClient witClient, WorkItemTrackingProcessHttpClient witTrackingClient)
-        {
-            if (witClient == null && witTrackingClient == null)
+            if (Settings.settings.Validate())
             {
-                throw new System.Exception("bad configs file");
+                return await GetCustomFieldPickListValue(fieldName, Settings.settings.OrgName, Settings.settings.PatToken);
             }
 
-            var field = await witClient.GetFieldAsync("Custom." + fieldName);
-            if (field.IsPicklist)
+            throw new System.Exception("bad config file");
+        }
+
+        public async static Task<(string, IList<string>)> GetCustomFieldPickListValue(string fieldName, string orgName, string pat)
+        {
+            var witTrackingPClient = await GetTFSHttpClient<WorkItemTrackingProcessHttpClient>(orgName, pat);
+            var witTrackingClient = await GetTFSHttpClient<WorkItemTrackingHttpClient>(orgName, pat);
+            var workItemField = await witTrackingClient.GetFieldAsync(fieldName);
+            if (workItemField.IsPicklist)
             {
-                var pickList = await witTrackingClient.GetListAsync(field.PicklistId.Value, GetCancellationToken(20));
+                var pickList = await witTrackingPClient.GetListAsync(workItemField.PicklistId.Value,GetCancellationToken(20));
                 if (pickList?.Items?.Count == 0)
                 {
-                    throw new System.Exception(fieldName + " field zero elements in picklist");
+                    throw new System.Exception(fieldName + " field has zero elements in picklist");
                 }
 
-                return (field.ReferenceName, pickList.Items);
+                return (workItemField.ReferenceName, pickList.Items);
             }
             else
             {
@@ -296,10 +294,9 @@ namespace AzureDevopsPlugin.Utilities
             }
 
             var witClient = await GetTFSHttpClient<WorkItemTrackingHttpClient>(orgName, patToken);
-            var witProcessClient = await GetTFSHttpClient<WorkItemTrackingProcessHttpClient>(orgName, patToken);
             var type = await witClient.GetWorkItemTypeAsync(projectName, workItemType, cancellationToken: GetCancellationToken(20));
-            (string categoryByComplexityRefName, IList<string> categoriesByComplexity) = await GetCustomFieldPickListValue(categoryByComplexityField, witClient, witProcessClient);
-            (string categoryBySourceRefName, IList<string> categoriesBySource) = await GetCustomFieldPickListValue(categoryBySourceField, witClient, witProcessClient);
+            (string categoryByComplexityRefName, IList<string> categoriesByComplexity) = await GetCustomFieldPickListValue(categoryByComplexityField, orgName, patToken);
+            (string categoryBySourceRefName, IList<string> categoriesBySource) = await GetCustomFieldPickListValue(categoryBySourceField, orgName, patToken);
             var states = await witClient.GetWorkItemTypeStatesAsync(projectName, workItemType, GetCancellationToken(20));
             Models.WorkItem.SetStates(states);
             Models.WorkItem.CategoryByComplexityReferenceName = categoryByComplexityRefName;
