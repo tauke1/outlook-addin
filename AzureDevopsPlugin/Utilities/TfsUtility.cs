@@ -251,7 +251,7 @@ namespace AzureDevopsPlugin.Utilities
         {
             var witTrackingPClient = await GetTFSHttpClient<WorkItemTrackingProcessHttpClient>(orgName, pat);
             var witTrackingClient = await GetTFSHttpClient<WorkItemTrackingHttpClient>(orgName, pat);
-            var workItemField = await witTrackingClient.GetFieldAsync(fieldName);
+            var workItemField = await witTrackingClient.GetFieldAsync(fieldName, GetCancellationToken(20));
             if (workItemField.IsPicklist)
             {
                 var pickList = await witTrackingPClient.GetListAsync(workItemField.PicklistId.Value,GetCancellationToken(20));
