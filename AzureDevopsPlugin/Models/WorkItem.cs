@@ -15,6 +15,8 @@ namespace AzureDevopsPlugin.Models
         public static Dictionary<string, KeyValuePair<string, Color>> States { get; set; } = new Dictionary<string, KeyValuePair<string, Color>>();
         public static List<string> CategoriesBySource { get; set; } = new List<string>();
         public static List<string> CategoriesByComplexity { get; set; } = new List<string>();
+        public static string CategoryBySourceReferenceName { get; set; }
+        public static string CategoryByComplexityReferenceName { get; set; }
 
         public int Id { get; set; }
 

@@ -6,6 +6,7 @@ using Microsoft.VisualStudio.Services.Common;
 using Microsoft.VisualStudio.Services.WebApi;
 using Microsoft.VisualStudio.Services.WebApi.Patch;
 using Microsoft.VisualStudio.Services.WebApi.Patch.Json;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -112,7 +113,7 @@ namespace AzureDevopsPlugin.Utilities
                 document.Add(
                 new JsonPatchOperation()
                 {
-                    Path = "/fields/Custom." + Settings.settings.CategoryBySourceField,
+                    Path = "/fields/" + Models.WorkItem.CategoryBySourceReferenceName,
                     Operation = Operation.Add,
                     Value = category
                 });
@@ -172,7 +173,7 @@ namespace AzureDevopsPlugin.Utilities
                     updateDocument.Add(
                     new JsonPatchOperation()
                     {
-                        Path = "/fields/Custom." + Settings.settings.CategoryByComplexityField,
+                        Path = "/fields/" + Models.WorkItem.CategoryByComplexityReferenceName,
                         Operation = Operation.Replace,
                         Value = complexity
                     });
@@ -217,11 +218,10 @@ namespace AzureDevopsPlugin.Utilities
                         "Order By [State] Asc, [Changed Date] Desc",
                 };
 
-                var complexityField = "Custom." + Settings.settings.CategoryByComplexityField;
                 var result = await workitemClient.QueryByWiqlAsync(wiql);
                 if (result.WorkItems.Count() > 0)
                 {
-                    var workItems = await workitemClient.GetWorkItemsAsync(result.WorkItems.Select(a => a.Id), new List<string> { "System.State", "System.Title", complexityField }, cancellationToken: GetCancellationToken(20));
+                    var workItems = await workitemClient.GetWorkItemsAsync(result.WorkItems.Select(a => a.Id), new List<string> { "System.State", "System.Title", Models.WorkItem.CategoryByComplexityReferenceName }, cancellationToken: GetCancellationToken(20));
                     foreach (var workItem in workItems)
                     {
                         if (!workItem.Id.HasValue)
@@ -229,7 +229,7 @@ namespace AzureDevopsPlugin.Utilities
                             continue;
                         }
 
-                        list.Add(new Models.WorkItem { Id = workItem.Id.Value, Title = (string)workItem.Fields["System.Title"], State = (string)workItem.Fields["System.State"], Complexity = workItem.Fields.ContainsKey(complexityField) ? (string)workItem.Fields[complexityField] : null });
+                        list.Add(new Models.WorkItem { Id = workItem.Id.Value, Title = (string)workItem.Fields["System.Title"], State = (string)workItem.Fields["System.State"], Complexity = workItem.Fields.ContainsKey(Models.WorkItem.CategoryByComplexityReferenceName) ? (string)workItem.Fields[Models.WorkItem.CategoryByComplexityReferenceName] : null });
                     }
                 }
 
@@ -239,14 +239,14 @@ namespace AzureDevopsPlugin.Utilities
             throw new System.Exception("bad settings file");
         }
 
-        public async static Task<IList<string>> GetCustomFieldPickListValue(string fieldName)
+        public async static Task<(string, IList<string>)> GetCustomFieldPickListValue(string fieldName)
         {
             var witClient = await GetTFSHttpClient<WorkItemTrackingHttpClient>();
             var witTrackingClient = await GetTFSHttpClient<WorkItemTrackingProcessHttpClient>();
             return await GetCustomFieldPickListValue(fieldName, witClient, witTrackingClient);
         }
 
-        public async static Task<IList<string>> GetCustomFieldPickListValue(string fieldName, WorkItemTrackingHttpClient witClient, WorkItemTrackingProcessHttpClient witTrackingClient)
+        public async static Task<(string,IList<string>)> GetCustomFieldPickListValue(string fieldName, WorkItemTrackingHttpClient witClient, WorkItemTrackingProcessHttpClient witTrackingClient)
         {
             if (witClient == null && witTrackingClient == null)
             {
@@ -262,7 +262,7 @@ namespace AzureDevopsPlugin.Utilities
                     throw new System.Exception(fieldName + " field zero elements in picklist");
                 }
 
-                return pickList.Items;
+                return (field.ReferenceName, pickList.Items);
             }
             else
             {
@@ -298,10 +298,12 @@ namespace AzureDevopsPlugin.Utilities
             var witClient = await GetTFSHttpClient<WorkItemTrackingHttpClient>(orgName, patToken);
             var witProcessClient = await GetTFSHttpClient<WorkItemTrackingProcessHttpClient>(orgName, patToken);
             var type = await witClient.GetWorkItemTypeAsync(projectName, workItemType, cancellationToken: GetCancellationToken(20));
-            var categoriesByComplexity = await GetCustomFieldPickListValue(categoryByComplexityField, witClient, witProcessClient);
-            var categoriesBySource = await GetCustomFieldPickListValue(categoryBySourceField, witClient, witProcessClient);
+            (string categoryByComplexityRefName, IList<string> categoriesByComplexity) = await GetCustomFieldPickListValue(categoryByComplexityField, witClient, witProcessClient);
+            (string categoryBySourceRefName, IList<string> categoriesBySource) = await GetCustomFieldPickListValue(categoryBySourceField, witClient, witProcessClient);
             var states = await witClient.GetWorkItemTypeStatesAsync(projectName, workItemType, GetCancellationToken(20));
             Models.WorkItem.SetStates(states);
+            Models.WorkItem.CategoryByComplexityReferenceName = categoryByComplexityRefName;
+            Models.WorkItem.CategoryBySourceReferenceName = categoryBySourceRefName;
             Models.WorkItem.CategoriesByComplexity = categoriesByComplexity.ToList();
             Models.WorkItem.CategoriesBySource = categoriesBySource.ToList();
         }
