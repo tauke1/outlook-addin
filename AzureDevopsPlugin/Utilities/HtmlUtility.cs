@@ -9,14 +9,9 @@ namespace AzureDevopsPlugin.Utilities
     public class HtmlUtility
     {
         /// <summary>
-        /// Get TFS client
-        /// </summary>
-        /// <returns></returns>
-        
-        /// <summary>
         /// Get last reply from message
         /// </summary>
-        /// <param name="mailItem"></param>
+        /// <param name="html">html body of current mail item</param>
         /// <returns></returns>
         public static string GetLastMessageFromMessageHTMLBody(string html)
         {
@@ -24,6 +19,8 @@ namespace AzureDevopsPlugin.Utilities
             htmlSnippet.LoadHtml(html);
             var divsByWordSection1Class = htmlSnippet.DocumentNode.SelectNodes("//div[@class = 'WordSection1']");
             HtmlNode headNode = null;
+            
+            // search <head> node
             if (htmlSnippet.DocumentNode.SelectSingleNode("//head") != null)
             {
                 headNode = htmlSnippet.DocumentNode.SelectSingleNode("//head");
@@ -45,7 +42,7 @@ namespace AzureDevopsPlugin.Utilities
                 return headNode != null ? headNode.OuterHtml + borderSplitted[0] : borderSplitted[0];
             }
 
-            /// finding first reply for messages sent from email by dir=ltr tag
+            // finding first reply for messages sent from email by dir=ltr tag
             var divsByLtrDir = htmlSnippet.DocumentNode.SelectNodes("//div[@dir = 'ltr']");
             if (divsByLtrDir?.Count > 0)
             {
@@ -56,6 +53,11 @@ namespace AzureDevopsPlugin.Utilities
             return htmlSnippet.DocumentNode.OuterHtml;
         }
 
+        /// <summary>
+        /// Remove head element from raw html
+        /// </summary>
+        /// <param name="html">html content</param>
+        /// <returns></returns>
         public static string RemoveHeaderFromHtml(string html)
         {
             HtmlAgilityPack.HtmlDocument htmlSnippet = new HtmlAgilityPack.HtmlDocument();
@@ -68,12 +70,18 @@ namespace AzureDevopsPlugin.Utilities
             return htmlSnippet.DocumentNode.OuterHtml;
         }
 
+        /// <summary>
+        /// Clear formatiing from html
+        /// </summary>
+        /// <param name="html"></param>
+        /// <returns></returns>
         public static string ClearFormattingOfHtml(string html)
         {
             HtmlAgilityPack.HtmlDocument htmlSnippet = new HtmlAgilityPack.HtmlDocument();
             htmlSnippet.LoadHtml(html);
             RemoveStyleAttributes(htmlSnippet);
             var htmlElement = htmlSnippet.DocumentNode;
+            // take only body element
             if (htmlElement.SelectSingleNode("//body") != null)
             {
                 htmlElement = htmlElement.SelectSingleNode("//body");
@@ -82,6 +90,10 @@ namespace AzureDevopsPlugin.Utilities
             return htmlElement.OuterHtml;
         }
 
+        /// <summary>
+        /// Remove all style attributes from html
+        /// </summary>
+        /// <param name="html"></param>
         public static void RemoveStyleAttributes(HtmlAgilityPack.HtmlDocument html)
         {
             var elementsWithStyleAttribute = html.DocumentNode.SelectNodes("//@style");
@@ -95,6 +107,11 @@ namespace AzureDevopsPlugin.Utilities
             }
         }
 
+        /// <summary>
+        /// Remove RE: or FW: from mail subject
+        /// </summary>
+        /// <param name="subject">mail subject</param>
+        /// <returns></returns>
         public static string RemoveSubjectAbbreviationsFromSubject(string subject)
         {
             if (subject.Length > 3)

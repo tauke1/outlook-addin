@@ -16,8 +16,16 @@ using System.Windows.Forms;
 
 namespace AzureDevopsPlugin.Utilities
 {
+    /// <summary>
+    /// Functions which works with TFS
+    /// </summary>
     public class TfsUtility
     {
+        /// <summary>
+        /// Get instance of needed http client, credentials take from settings
+        /// </summary>
+        /// <typeparam name="T">Http client type</typeparam>
+        /// <returns></returns>
         public async static Task<T> GetTFSHttpClient<T>() where T : VssHttpClientBase
         {
             var valid = Settings.settings.Validate();
@@ -28,11 +36,19 @@ namespace AzureDevopsPlugin.Utilities
             return null;
         }
 
+        /// <summary>
+        /// Parametrized method which returns http client of TFS
+        /// </summary>
+        /// <typeparam name="T">Http client type</typeparam>
+        /// <param name="orgName">TFS organization name</param>
+        /// <param name="PatToken">TFS PAT token</param>
+        /// <returns></returns>
         public async static Task<T> GetTFSHttpClient<T>(string orgName, string PatToken) where T : VssHttpClientBase
         {
             var u = new Uri($"https://dev.azure.com/" + orgName);
             VssCredentials c = new VssCredentials(new VssBasicCredential(string.Empty, PatToken));
             var connection = new VssConnection(u, c);
+            // check connection
             await connection.ConnectAsync();
             return await connection.GetClientAsync<T>();
         }
@@ -47,25 +63,26 @@ namespace AzureDevopsPlugin.Utilities
             var workitemClient = await GetTFSHttpClient<WorkItemTrackingHttpClient>();
             if (workitemClient != null)
             {
+                // open file steam on temporary saved attachment path
                 using (FileStream attStream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
                 {
                     var fileName = Path.GetFileName(filePath);
                     return await workitemClient.CreateAttachmentAsync(attStream, uploadType: "simple", fileName: fileName, cancellationToken: GetCancellationToken(30)); // upload the file
-
                 }
             }
 
+            // this case will not occur in reality
             throw new System.Exception("settings are not valid");
         }
 
         /// <summary>
         /// Create work item in TFS(Azure Devops)
         /// </summary>
-        /// <param name="title"></param>
-        /// <param name="description"></param>
-        /// <param name="category"></param>
-        /// <param name="attachments"></param>
-        /// <param name="withAttachments"></param>
+        /// <param name="title">work item title</param>
+        /// <param name="description">work item description</param>
+        /// <param name="category">work item category</param>
+        /// <param name="attachments">work item attachments</param>
+        /// <param name="withAttachments">include attachments flag</param>
         /// <returns></returns>
         public async static Task<WorkItem> CreateWorkItem(string title, string description, string category, Attachments attachments = null, bool withAttachments = false)
         {
@@ -77,10 +94,12 @@ namespace AzureDevopsPlugin.Utilities
                 {
                     foreach (Attachment att in attachments)
                     {
+                        // save file to temporary path
                         var savePath = System.IO.Path.GetTempPath() + att.FileName;
                         att.SaveAsFile(savePath);
                         var savedAttachment = await CreateAttachment(savePath);
                         document.Add(CreateAttachmentJsonPatchOperation(savedAttachment));
+                        // delete after attachment created
                         File.Delete(savePath);
                     }
                 }
@@ -122,6 +141,11 @@ namespace AzureDevopsPlugin.Utilities
             throw new System.Exception("Settings is not valid!");
         }
 
+        /// <summary>
+        /// Create document for work item with attachment info
+        /// </summary>
+        /// <param name="reference">attachment reference</param>
+        /// <returns></returns>
         private static JsonPatchOperation CreateAttachmentJsonPatchOperation(AttachmentReference reference)
         {
             return new JsonPatchOperation()
@@ -143,6 +167,8 @@ namespace AzureDevopsPlugin.Utilities
         /// <param name="comment">comment text</param>
         /// <param name="attachments">attachments</param>
         /// <param name="withAttachments">include attachments flag</param>
+        /// <param name="state">State of work item</param>
+        /// <param name="complexity">Complexity</param>
         /// <returns></returns>
         public async static Task<Comment> AddCommentToWorkItem(int workItemId, string state, string comment, Attachments attachments = null, bool withAttachments = false, string complexity = null)
         {
@@ -188,12 +214,12 @@ namespace AzureDevopsPlugin.Utilities
                 await workItemsClient.UpdateWorkItemAsync(updateDocument, workItem.Id.Value);
                 return await workItemsClient.AddCommentAsync(new CommentCreate { Text = comment }, Settings.settings.ProjectName, workItem.Id.Value, cancellationToken: GetCancellationToken(20));
             }
-
+            // in reality this case should not occur
             throw new System.Exception("Bad settings!");
         }
 
         /// <summary>
-        /// Find work items by title
+        /// Find work items by title containing substring
         /// </summary>
         /// <param name="title">work item title</param>
         /// <returns></returns>
@@ -222,6 +248,7 @@ namespace AzureDevopsPlugin.Utilities
                     var workItems = await workitemClient.GetWorkItemsAsync(result.WorkItems.Select(a => a.Id), new List<string> { "System.State", "System.Title", Models.WorkItem.CategoryByComplexityReferenceName }, cancellationToken: GetCancellationToken(20));
                     foreach (var workItem in workItems)
                     {
+                        // avoid cases when id is null
                         if (!workItem.Id.HasValue)
                         {
                             continue;
@@ -234,9 +261,15 @@ namespace AzureDevopsPlugin.Utilities
                 return list;
             }
 
+            // in reality this case will not occur
             throw new System.Exception("bad settings file");
         }
 
+        /// <summary>
+        /// Get custom field picklist values
+        /// </summary>
+        /// <param name="fieldName">custom field name</param>
+        /// <returns></returns>
         public async static Task<(string, IList<string>)> GetCustomFieldPickListValue(string fieldName)
         {
             if (Settings.settings.Validate())
@@ -244,9 +277,17 @@ namespace AzureDevopsPlugin.Utilities
                 return await GetCustomFieldPickListValue(fieldName, Settings.settings.OrgName, Settings.settings.PatToken);
             }
 
+            // in reality this case should not occur
             throw new System.Exception("bad config file");
         }
 
+        /// <summary>
+        /// Get custom field picklist values with credentials parameters 
+        /// </summary>
+        /// <param name="fieldName">custom field name</param>
+        /// <param name="orgName">organization name</param>
+        /// <param name="pat">PAT token</param>
+        /// <returns></returns>
         public async static Task<(string, IList<string>)> GetCustomFieldPickListValue(string fieldName, string orgName, string pat)
         {
             var witTrackingPClient = await GetTFSHttpClient<WorkItemTrackingProcessHttpClient>(orgName, pat);
@@ -268,6 +309,10 @@ namespace AzureDevopsPlugin.Utilities
             }
         }
 
+        /// <summary>
+        /// Validate VSS connection based on settings
+        /// </summary>
+        /// <returns></returns>
         public async static Task<bool> ValidateVssSettings()
         {
             try
@@ -286,6 +331,16 @@ namespace AzureDevopsPlugin.Utilities
             return false;
         }
 
+        /// <summary>
+        /// Validate VSS connection
+        /// </summary>
+        /// <param name="workItemType">work item type</param>
+        /// <param name="projectName">project name</param>
+        /// <param name="categoryBySourceField">category by source</param>
+        /// <param name="categoryByComplexityField">category by complexity</param>
+        /// <param name="orgName">organization name</param>
+        /// <param name="patToken">PAT token</param>
+        /// <returns></returns>
         public async static Task ValidateVssSettings(string workItemType, string projectName, string categoryBySourceField, string categoryByComplexityField, string orgName, string patToken)
         {
             if (string.IsNullOrEmpty(workItemType) || string.IsNullOrEmpty(projectName) || string.IsNullOrEmpty(categoryBySourceField) || string.IsNullOrEmpty(orgName) || string.IsNullOrEmpty(patToken))
@@ -305,7 +360,18 @@ namespace AzureDevopsPlugin.Utilities
             Models.WorkItem.CategoriesBySource = categoriesBySource.ToList();
         }
 
+        /// <summary>
+        /// Process exceptions to take right text
+        /// </summary>
+        /// <param name="ex">exception</param>
+        /// <returns></returns>
         public static string ProcessException(System.Exception ex) => ex.InnerException != null ? ex.InnerException is VssUnauthorizedException ? "PAT token is invalid, or has not enough permissions" : ex.InnerException.Message : ex.Message;
+        
+        /// <summary>
+        /// Get cancellation token with timeout
+        /// </summary>
+        /// <param name="seconds">seconds of timeout</param>
+        /// <returns></returns>
         public static CancellationToken GetCancellationToken(int seconds) => (new CancellationTokenSource(TimeSpan.FromSeconds(seconds))).Token;
     }
 }

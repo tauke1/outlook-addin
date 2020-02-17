@@ -10,9 +10,17 @@ using System.Windows.Forms;
 
 namespace AzureDevopsPlugin.Forms
 {
+    /// <summary>
+    /// Form which shows info that work item has been created
+    /// </summary>
     public partial class WorkItemCreated : Form
     {
         private int _workItemId { get; set; }
+        
+        /// <summary>
+        /// Initialize WOrkItemCreated form
+        /// </summary>
+        /// <param name="workItemId">id of created work item</param>
         public WorkItemCreated(int workItemId)
         {
             _workItemId = workItemId;
@@ -29,7 +37,7 @@ namespace AzureDevopsPlugin.Forms
                 {
                     System.Diagnostics.Process.Start(url);
                 }
-                catch (System.Exception ex)
+                catch
                 {
                 }
             }

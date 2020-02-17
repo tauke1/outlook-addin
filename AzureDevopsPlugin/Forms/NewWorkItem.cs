@@ -104,6 +104,10 @@ namespace AzureDevopsPlugin.Forms
             return true;
         }
 
+        /// <summary>
+        /// Disable all controls
+        /// </summary>
+        /// <param name="state"></param>
         private void ChangeEnabledStateOfControls(bool state)
         {
             foreach (Control control in this.Controls)
@@ -112,6 +116,11 @@ namespace AzureDevopsPlugin.Forms
             }
         }
 
+        /// <summary>
+        /// Create work item
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private async void workItemCreateBtn_Click(object sender, EventArgs e)
         {
             if (Settings.settings.Validate() && ValidateWorkItemFields())
@@ -153,11 +162,15 @@ namespace AzureDevopsPlugin.Forms
             ResetFields();
         }
 
+        /// <summary>
+        /// Reset all fields
+        /// </summary>
         private void ResetFields()
         {
             titleTextBox.Text = HtmlUtility.RemoveSubjectAbbreviationsFromSubject(_outlookItem.Subject);
             descriptionTextBox.Html = HtmlUtility.GetLastMessageFromMessageHTMLBody(_outlookItem.HTMLBody);
         }
+
         private void setOriginalBodyBtn_Click(object sender, EventArgs e)
         {
             descriptionTextBox.Html = _outlookItem.HTMLBody;
